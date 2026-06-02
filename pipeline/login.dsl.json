@@ -1,0 +1,1005 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "source": "html-export",
+    "file_id": "html-04ddbf6bbefe",
+    "file_name": "登录 — FlowDesk",
+    "created_at": "2026-06-02T00:00:00Z",
+    "updated_at": "2026-06-02T00:00:00Z"
+  },
+  "pages": [
+    {
+      "id": "0:1",
+      "name": "Page 1",
+      "layers": [
+        {
+          "id": "1:6",
+          "name": "Section/nav",
+          "type": "frame",
+          "visible": true,
+          "opacity": 1,
+          "blend_mode": "normal",
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 64
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "visible": true,
+              "opacity": 1,
+              "color": "#FFFFFFFF"
+            }
+          ],
+          "children": [
+            {
+              "id": "1:1",
+              "name": "FlowDesk",
+              "type": "text",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": {
+                "x": 160,
+                "y": 80,
+                "width": 1120,
+                "height": 21.0
+              },
+              "text_content": "FlowDesk",
+              "text_style": {
+                "font_family": "PingFang SC",
+                "font_style": "Bold",
+                "font_size": 14,
+                "color": "#0F172AFF",
+                "letter_spacing": 0,
+                "line_height": "auto",
+                "align_h": "left",
+                "align_v": "center"
+              }
+            },
+            {
+              "id": "1:5",
+              "name": "nav",
+              "type": "frame",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": {
+                "x": 160,
+                "y": 125.0,
+                "width": 1120,
+                "height": 81.0
+              },
+              "fills": [],
+              "children": [
+                {
+                  "id": "1:2",
+                  "name": "还没有账号？",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 1120,
+                    "height": 21.0
+                  },
+                  "text_content": "还没有账号？",
+                  "text_style": {
+                    "font_family": "PingFang SC",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#64748BFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:3",
+                  "name": "Button/免费注册",
+                  "type": "frame",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 0,
+                    "y": 29.0,
+                    "width": 160,
+                    "height": 44
+                  },
+                  "fills": [
+                    {
+                      "type": "solid",
+                      "visible": true,
+                      "opacity": 1,
+                      "color": "#4F46E5FF"
+                    }
+                  ],
+                  "corner_radius": 12,
+                  "auto_layout": {
+                    "direction": "horizontal",
+                    "gap": 0,
+                    "counter_gap": 0,
+                    "padding": [
+                      12,
+                      24,
+                      12,
+                      24
+                    ],
+                    "align_items": "center",
+                    "justify_content": "center",
+                    "wrap": false
+                  },
+                  "children": [
+                    {
+                      "id": "1:4",
+                      "name": "免费注册",
+                      "type": "text",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 112,
+                        "height": 20
+                      },
+                      "text_content": "免费注册",
+                      "text_style": {
+                        "font_family": "PingFang SC",
+                        "font_style": "Regular",
+                        "font_size": 14,
+                        "color": "#FFFFFFFF",
+                        "letter_spacing": 0,
+                        "line_height": "auto",
+                        "align_h": "left",
+                        "align_v": "center"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "1:34",
+          "name": "Section/form",
+          "type": "frame",
+          "visible": true,
+          "opacity": 1,
+          "blend_mode": "normal",
+          "box": {
+            "x": 0,
+            "y": 64,
+            "width": 1440,
+            "height": 400
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "visible": true,
+              "opacity": 1,
+              "color": "#FFFFFFFF"
+            }
+          ],
+          "children": [
+            {
+              "id": "1:33",
+              "name": "Card",
+              "type": "frame",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": {
+                "x": 160,
+                "y": 80,
+                "width": 1120,
+                "height": 689.0
+              },
+              "fills": [
+                {
+                  "type": "solid",
+                  "visible": true,
+                  "opacity": 1,
+                  "color": "#FFFFFFFF"
+                }
+              ],
+              "strokes": [
+                {
+                  "type": "solid",
+                  "visible": true,
+                  "opacity": 1,
+                  "color": "#E2E8F0FF"
+                }
+              ],
+              "corner_radius": 12,
+              "children": [
+                {
+                  "id": "1:9",
+                  "name": "center",
+                  "type": "frame",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 24,
+                    "y": 24,
+                    "width": 1072,
+                    "height": 85.0
+                  },
+                  "fills": [],
+                  "children": [
+                    {
+                      "id": "1:7",
+                      "name": "欢迎回来",
+                      "type": "text",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 1072,
+                        "height": 48.0
+                      },
+                      "text_content": "欢迎回来",
+                      "text_style": {
+                        "font_family": "PingFang SC",
+                        "font_style": "Bold",
+                        "font_size": 14,
+                        "color": "#0F172AFF",
+                        "letter_spacing": 0,
+                        "line_height": "auto",
+                        "align_h": "left",
+                        "align_v": "center"
+                      }
+                    },
+                    {
+                      "id": "1:8",
+                      "name": "登录你的 FlowDesk 账号",
+                      "type": "text",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 56.0,
+                        "width": 1072,
+                        "height": 21.0
+                      },
+                      "text_content": "登录你的 FlowDesk 账号",
+                      "text_style": {
+                        "font_family": "PingFang SC",
+                        "font_style": "Regular",
+                        "font_size": 14,
+                        "color": "#0F172AFF",
+                        "letter_spacing": 0,
+                        "line_height": "auto",
+                        "align_h": "left",
+                        "align_v": "center"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "1:24",
+                  "name": "form",
+                  "type": "frame",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 24,
+                    "y": 117.0,
+                    "width": 1072,
+                    "height": 383.0
+                  },
+                  "fills": [],
+                  "children": [
+                    {
+                      "id": "1:12",
+                      "name": "form-group",
+                      "type": "frame",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 1072,
+                        "height": 93.0
+                      },
+                      "fills": [],
+                      "children": [
+                        {
+                          "id": "1:10",
+                          "name": "邮箱地址",
+                          "type": "text",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 1072,
+                            "height": 21.0
+                          },
+                          "text_content": "邮箱地址",
+                          "text_style": {
+                            "font_family": "PingFang SC",
+                            "font_style": "Regular",
+                            "font_size": 14,
+                            "color": "#0F172AFF",
+                            "letter_spacing": 0,
+                            "line_height": "auto",
+                            "align_h": "left",
+                            "align_v": "center"
+                          }
+                        },
+                        {
+                          "id": "1:11",
+                          "name": "name@company.com",
+                          "type": "instance",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 29.0,
+                            "width": 1072,
+                            "height": 56
+                          },
+                          "instance": {
+                            "symbol_id": "40:34721",
+                            "variant_key": "698f83c7c28a321a105e40cde98616611f668d8d",
+                            "component_set_key": "2a32df63656ddde67ed3758de2043188b51234c6",
+                            "component_set_resolved": true,
+                            "variant_props": {
+                              "灰色场景": "OFF",
+                              "状态": "Normal"
+                            },
+                            "overrides": []
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "1:18",
+                      "name": "form-group",
+                      "type": "frame",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 101.0,
+                        "width": 1072,
+                        "height": 153.0
+                      },
+                      "fills": [],
+                      "children": [
+                        {
+                          "id": "1:16",
+                          "name": "div",
+                          "type": "frame",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 1072,
+                            "height": 81.0
+                          },
+                          "fills": [],
+                          "children": [
+                            {
+                              "id": "1:13",
+                              "name": "密码",
+                              "type": "text",
+                              "visible": true,
+                              "opacity": 1,
+                              "blend_mode": "normal",
+                              "box": {
+                                "x": 0,
+                                "y": 0,
+                                "width": 1072,
+                                "height": 21.0
+                              },
+                              "text_content": "密码",
+                              "text_style": {
+                                "font_family": "PingFang SC",
+                                "font_style": "Regular",
+                                "font_size": 14,
+                                "color": "#0F172AFF",
+                                "letter_spacing": 0,
+                                "line_height": "auto",
+                                "align_h": "left",
+                                "align_v": "center"
+                              }
+                            },
+                            {
+                              "id": "1:14",
+                              "name": "Button/忘记密码？",
+                              "type": "frame",
+                              "visible": true,
+                              "opacity": 1,
+                              "blend_mode": "normal",
+                              "box": {
+                                "x": 0,
+                                "y": 29.0,
+                                "width": 160,
+                                "height": 44
+                              },
+                              "fills": [
+                                {
+                                  "type": "solid",
+                                  "visible": true,
+                                  "opacity": 1,
+                                  "color": "#FFFFFFFF"
+                                }
+                              ],
+                              "corner_radius": 12,
+                              "auto_layout": {
+                                "direction": "horizontal",
+                                "gap": 0,
+                                "counter_gap": 0,
+                                "padding": [
+                                  12,
+                                  24,
+                                  12,
+                                  24
+                                ],
+                                "align_items": "center",
+                                "justify_content": "center",
+                                "wrap": false
+                              },
+                              "children": [
+                                {
+                                  "id": "1:15",
+                                  "name": "忘记密码？",
+                                  "type": "text",
+                                  "visible": true,
+                                  "opacity": 1,
+                                  "blend_mode": "normal",
+                                  "box": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "width": 112,
+                                    "height": 20
+                                  },
+                                  "text_content": "忘记密码？",
+                                  "text_style": {
+                                    "font_family": "PingFang SC",
+                                    "font_style": "Regular",
+                                    "font_size": 14,
+                                    "color": "#0F172AFF",
+                                    "letter_spacing": 0,
+                                    "line_height": "auto",
+                                    "align_h": "left",
+                                    "align_v": "center"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "1:17",
+                          "name": "••••••••",
+                          "type": "instance",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 89.0,
+                            "width": 1072,
+                            "height": 56
+                          },
+                          "instance": {
+                            "symbol_id": "40:34721",
+                            "variant_key": "698f83c7c28a321a105e40cde98616611f668d8d",
+                            "component_set_key": "2a32df63656ddde67ed3758de2043188b51234c6",
+                            "component_set_resolved": true,
+                            "variant_props": {
+                              "灰色场景": "OFF",
+                              "状态": "Normal"
+                            },
+                            "overrides": []
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "1:21",
+                      "name": "div",
+                      "type": "frame",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 262.0,
+                        "width": 1072,
+                        "height": 61.0
+                      },
+                      "fills": [],
+                      "children": [
+                        {
+                          "id": "1:19",
+                          "name": "remember",
+                          "type": "instance",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 24,
+                            "height": 24
+                          },
+                          "instance": {
+                            "symbol_id": "1:10061",
+                            "variant_key": "3c7ba0ae81232ec365d583991bfb516d63884be6",
+                            "component_set_key": "046927ae52510fcabba0878576981637ffddf698",
+                            "component_set_resolved": true,
+                            "variant_props": {
+                              "Selected": "OFF",
+                              "状态": "Enabled"
+                            },
+                            "overrides": []
+                          }
+                        },
+                        {
+                          "id": "1:20",
+                          "name": "记住我 30 天",
+                          "type": "text",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 32,
+                            "width": 1072,
+                            "height": 21.0
+                          },
+                          "text_content": "记住我 30 天",
+                          "text_style": {
+                            "font_family": "PingFang SC",
+                            "font_style": "Regular",
+                            "font_size": 14,
+                            "color": "#0F172AFF",
+                            "letter_spacing": 0,
+                            "line_height": "auto",
+                            "align_h": "left",
+                            "align_v": "center"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "1:22",
+                      "name": "Button/登录",
+                      "type": "frame",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 331.0,
+                        "width": 160,
+                        "height": 44
+                      },
+                      "fills": [
+                        {
+                          "type": "solid",
+                          "visible": true,
+                          "opacity": 1,
+                          "color": "#4F46E5FF"
+                        }
+                      ],
+                      "corner_radius": 12,
+                      "auto_layout": {
+                        "direction": "horizontal",
+                        "gap": 0,
+                        "counter_gap": 0,
+                        "padding": [
+                          12,
+                          24,
+                          12,
+                          24
+                        ],
+                        "align_items": "center",
+                        "justify_content": "center",
+                        "wrap": false
+                      },
+                      "children": [
+                        {
+                          "id": "1:23",
+                          "name": "登录",
+                          "type": "text",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 112,
+                            "height": 20
+                          },
+                          "text_content": "登录",
+                          "text_style": {
+                            "font_family": "PingFang SC",
+                            "font_style": "Regular",
+                            "font_size": 14,
+                            "color": "#FFFFFFFF",
+                            "letter_spacing": 0,
+                            "line_height": "auto",
+                            "align_h": "left",
+                            "align_v": "center"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "1:32",
+                  "name": "div",
+                  "type": "frame",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 24,
+                    "y": 508.0,
+                    "width": 1072,
+                    "height": 149.0
+                  },
+                  "fills": [],
+                  "children": [
+                    {
+                      "id": "1:26",
+                      "name": "div",
+                      "type": "frame",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 1072,
+                        "height": 29.0
+                      },
+                      "fills": [],
+                      "children": [
+                        {
+                          "id": "1:25",
+                          "name": "或使用以下方式登录",
+                          "type": "text",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 1072,
+                            "height": 21.0
+                          },
+                          "text_content": "或使用以下方式登录",
+                          "text_style": {
+                            "font_family": "PingFang SC",
+                            "font_style": "Regular",
+                            "font_size": 14,
+                            "color": "#64748BFF",
+                            "letter_spacing": 0,
+                            "line_height": "auto",
+                            "align_h": "left",
+                            "align_v": "center"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "1:31",
+                      "name": "div",
+                      "type": "frame",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": {
+                        "x": 0,
+                        "y": 37.0,
+                        "width": 1072,
+                        "height": 104
+                      },
+                      "fills": [],
+                      "children": [
+                        {
+                          "id": "1:27",
+                          "name": "Button/Google",
+                          "type": "frame",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 0,
+                            "width": 160,
+                            "height": 44
+                          },
+                          "fills": [
+                            {
+                              "type": "solid",
+                              "visible": true,
+                              "opacity": 1,
+                              "color": "#FFFFFFFF"
+                            }
+                          ],
+                          "corner_radius": 12,
+                          "auto_layout": {
+                            "direction": "horizontal",
+                            "gap": 0,
+                            "counter_gap": 0,
+                            "padding": [
+                              12,
+                              24,
+                              12,
+                              24
+                            ],
+                            "align_items": "center",
+                            "justify_content": "center",
+                            "wrap": false
+                          },
+                          "children": [
+                            {
+                              "id": "1:28",
+                              "name": "Google",
+                              "type": "text",
+                              "visible": true,
+                              "opacity": 1,
+                              "blend_mode": "normal",
+                              "box": {
+                                "x": 0,
+                                "y": 0,
+                                "width": 112,
+                                "height": 20
+                              },
+                              "text_content": "Google",
+                              "text_style": {
+                                "font_family": "PingFang SC",
+                                "font_style": "Regular",
+                                "font_size": 14,
+                                "color": "#0F172AFF",
+                                "letter_spacing": 0,
+                                "line_height": "auto",
+                                "align_h": "center",
+                                "align_v": "center"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "id": "1:29",
+                          "name": "Button/飞书",
+                          "type": "frame",
+                          "visible": true,
+                          "opacity": 1,
+                          "blend_mode": "normal",
+                          "box": {
+                            "x": 0,
+                            "y": 52,
+                            "width": 160,
+                            "height": 44
+                          },
+                          "fills": [
+                            {
+                              "type": "solid",
+                              "visible": true,
+                              "opacity": 1,
+                              "color": "#FFFFFFFF"
+                            }
+                          ],
+                          "corner_radius": 12,
+                          "auto_layout": {
+                            "direction": "horizontal",
+                            "gap": 0,
+                            "counter_gap": 0,
+                            "padding": [
+                              12,
+                              24,
+                              12,
+                              24
+                            ],
+                            "align_items": "center",
+                            "justify_content": "center",
+                            "wrap": false
+                          },
+                          "children": [
+                            {
+                              "id": "1:30",
+                              "name": "飞书",
+                              "type": "text",
+                              "visible": true,
+                              "opacity": 1,
+                              "blend_mode": "normal",
+                              "box": {
+                                "x": 0,
+                                "y": 0,
+                                "width": 112,
+                                "height": 20
+                              },
+                              "text_content": "飞书",
+                              "text_style": {
+                                "font_family": "PingFang SC",
+                                "font_style": "Regular",
+                                "font_size": 14,
+                                "color": "#0F172AFF",
+                                "letter_spacing": 0,
+                                "line_height": "auto",
+                                "align_h": "center",
+                                "align_v": "center"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "1:40",
+          "name": "Section/footer",
+          "type": "frame",
+          "visible": true,
+          "opacity": 1,
+          "blend_mode": "normal",
+          "box": {
+            "x": 0,
+            "y": 464,
+            "width": 1440,
+            "height": 320
+          },
+          "fills": [
+            {
+              "type": "solid",
+              "visible": true,
+              "opacity": 1,
+              "color": "#F8FAFCFF"
+            }
+          ],
+          "children": [
+            {
+              "id": "1:35",
+              "name": "© 2026 FlowDesk Inc.",
+              "type": "text",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": {
+                "x": 160,
+                "y": 80,
+                "width": 1120,
+                "height": 21.0
+              },
+              "text_content": "© 2026 FlowDesk Inc.",
+              "text_style": {
+                "font_family": "PingFang SC",
+                "font_style": "Regular",
+                "font_size": 14,
+                "color": "#0F172AFF",
+                "letter_spacing": 0,
+                "line_height": "auto",
+                "align_h": "left",
+                "align_v": "center"
+              }
+            },
+            {
+              "id": "1:39",
+              "name": "div",
+              "type": "frame",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": {
+                "x": 160,
+                "y": 125.0,
+                "width": 1120,
+                "height": 84
+              },
+              "fills": [],
+              "children": [
+                {
+                  "id": "1:36",
+                  "name": "隐私政策",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 36,
+                    "height": 20
+                  },
+                  "text_content": "隐私政策",
+                  "text_style": {
+                    "font_family": "PingFang SC",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#64748BFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:37",
+                  "name": "服务条款",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 0,
+                    "y": 28,
+                    "width": 36,
+                    "height": 20
+                  },
+                  "text_content": "服务条款",
+                  "text_style": {
+                    "font_family": "PingFang SC",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#64748BFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:38",
+                  "name": "帮助",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": {
+                    "x": 0,
+                    "y": 56,
+                    "width": 18,
+                    "height": 20
+                  },
+                  "text_content": "帮助",
+                  "text_style": {
+                    "font_family": "PingFang SC",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#64748BFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

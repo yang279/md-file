@@ -1,0 +1,2582 @@
+message Paint {
+  PaintType type = 1;
+  Color color = 2;
+  float opacity = 3;
+  bool visible = 4;
+  BlendMode blendMode = 5;
+  ColorStop[] stops = 6;
+  Matrix transform = 7;
+  ImageMessage image = 8;
+  ImageMessage imageThumbnail = 9;
+  ImageMessage animatedImage = 10;
+  int animationFrame = 11;
+  ImageScaleMode imageScaleMode = 12;
+  float rotation = 13;
+  float scale = 14;
+  PaintFilterMessage paintFilter = 15;
+  int[] emojiCodePoints = 16;
+  int originalImageWidth = 17;
+  int originalImageHeight = 18;
+  ImageMessage video = 19;
+  VariableData colorVar = 20;
+  ColorStopVar[] stopsVar = 21;
+  Vector patternSpacing = 22;
+  PatternTileType patternTileType = 23;
+  PatternAlignment verticalAlignment = 24;
+  PatternAlignment horizontalAlignment = 25;
+  GUID sourceNodeId = 26;
+  float spacing = 27;
+}
+
+message PaintFilterMessage {
+  float tint = 1;
+  float shadows = 2;
+  float highlights = 3;
+  float exposure = 4;
+  float temperature = 5;
+  float vibrance = 6;
+  float contrast = 7;
+  float hue = 8;
+}
+
+message ColorStop {
+  Color color = 1;
+  float position = 2;
+}
+
+message ImageMessage {
+  byte[] hash = 1;
+  string name = 2;
+  int dataBlob = 3;
+}
+
+message Path {
+  int blobIndex = 1;
+  WindingRule windingRule = 2;
+  int pxTag = 3;
+}
+
+message GUIDPath {
+  GUID[] guids = 1;
+}
+
+message VectorData {
+  int vectorNetworkBlob = 1;
+  Vector normalizedSize = 2;
+  VectorStyleData[] styleOverrideTable = 3;
+}
+
+message ArcData {
+  float startingAngle = 1;
+  float endingAngle = 2;
+  float innerRadius = 3;
+}
+
+message Effect {
+  EffectType type = 1;
+  Color color = 2;
+  Vector offset = 3;
+  float radius = 4;
+  bool visible = 5;
+  BlendMode blendMode = 6;
+  float spread = 7;
+  bool showShadowBehindNode = 8;
+  float saturation = 9;
+  VariableData radiusVar = 10;
+  VariableData colorVar = 11;
+  VariableData spreadVar = 12;
+  VariableData xVar = 13;
+  VariableData yVar = 14;
+  float refractionRadius = 15;
+  float specularAngle = 16;
+  float specularIntensity = 17;
+  float chromaticAberration = 18;
+  float refractionIntensity = 19;
+  float brightness = 20;
+  bool uniformLight = 21;
+  BlurOpType blurOpType = 22;
+  float startRadius = 23;
+  Matrix transform = 24;
+  float bevelSize = 25;
+  Vector noiseSize = 26;
+  float density = 27;
+  NoiseType noiseType = 28;
+  float opacity = 29;
+  Color secondaryColor = 30;
+  bool clipToShape = 31;
+  int seed = 32;
+  bool isImpact = 33;
+  float samplingRange = 34;
+  float splay = 35;
+  bool isConvex = 36;
+  Vector center = 37;
+  float motionAngle = 38;
+}
+
+message SymbolData {
+  GUID symbolID = 1;
+  PixsoNode[] symbolOverrides = 2;
+  float uniformScaleFactor = 3;
+}
+
+message LayoutGrid {
+  LayoutGridType type = 1;
+  Axis axis = 2;
+  bool visible = 3;
+  int numSections = 4;
+  float offset = 5;
+  float sectionSize = 6;
+  float gutterSize = 7;
+  Color color = 8;
+  LayoutGridPattern pattern = 9;
+  VariableData numSectionsVar = 10;
+  VariableData offsetVar = 11;
+  VariableData sectionSizeVar = 12;
+  VariableData gutterSizeVar = 13;
+}
+
+message GridTrackSizing {
+  GUID id = 1;
+  GridTrackSizingType type = 2;
+  float value = 3;
+}
+
+message ExportConstraint {
+  ExportConstraintType type = 1;
+  float value = 2;
+}
+
+message ExportSettings {
+  string suffix = 1;
+  ImageType imageType = 2;
+  ExportConstraint constraint = 3;
+  bool svgDataName = 4;
+  ExportSVGIDMode svgIDMode = 5;
+  bool svgOutlineText = 6;
+  bool contentsOnly = 7;
+  bool svgForceStrokeMasks = 8;
+}
+
+message FontName {
+  string family = 1;
+  string style = 2;
+  string postscript = 3;
+}
+
+message TextData {
+  string characters = 1;
+  int[] characterStyleIDs = 2;
+  TextStyleData[] styleOverrideTable = 3;
+  Vector layoutSize = 4;
+  Baseline[] baselines = 5;
+  Glyph[] glyphs = 6;
+  Decoration[] decorations = 7;
+  int layoutVersion = 8;
+  FontMetaData[] fontMetaData = 9;
+  FontName[] fallbackFonts = 10;
+  HyperlinkBox[] hyperlinkBoxes = 11;
+  ParagraphStyle[] paragraphStyle = 12;
+  PlaceHolder[] placeHolders = 13;
+  int truncationStartIndex = 14;
+  float truncatedHeight = 15;
+  GlyphPose[] glyphPoses = 16;
+  bool isDirty = 17;
+}
+
+message HyperlinkBox {
+  Rect bounds = 1;
+  string url = 2;
+  GUID guid = 3;
+  int hyperlinkID = 4;
+}
+
+message FontMetaData {
+  FontName key = 1;
+  float fontLineHeight = 2;
+  byte[] fontDigest = 3;
+  FontStyle fontStyle = 4;
+  int fontWeight = 5;
+}
+
+message Decoration {
+  Rect[] rects = 1;
+  int styleID = 2;
+}
+
+message Glyph {
+  int blobIndex = 1;
+  Vector position = 2;
+  int styleID = 3;
+  float fontSize = 4;
+  int firstCharacter = 5;
+  float advance = 6;
+}
+
+message ParagraphStyle {
+  TextListStyle listType = 1;
+  uint indentationLevel = 2;
+  uint listStartOffset = 3;
+  bool isFirstLineOfList = 4;
+  Directionality sourceDirectionality = 5;
+  Directionality directionality = 6;
+}
+
+message Baseline {
+  Vector position = 1;
+  float width = 2;
+  float lineY = 3;
+  float lineHeight = 4;
+  float lineAscent = 5;
+  int firstCharacter = 6;
+  int endCharacter = 7;
+}
+
+message KeyTrigger {
+  int[] keyCodes = 1;
+  TriggerDevice triggerDevice = 2;
+}
+
+message PrototypeDevice {
+  PrototypeDeviceType type = 1;
+  Vector size = 2;
+  string presetIdentifier = 3;
+  DeviceRotation rotation = 4;
+}
+
+message PrototypeInteraction {
+  GUID id = 1;
+  PrototypeEvent event = 2;
+  PrototypeAction[] actions = 3;
+  bool isDeleted = 4;
+}
+
+message ConditionalActions {
+  PrototypeAction[] actions = 1;
+  VariableData condition = 2;
+}
+
+message VideoPlayback {
+  bool autoplay = 1;
+  bool mediaLoop = 2;
+  bool muted = 3;
+  bool showControls = 4;
+  int startTimeMs = 5;
+  int endTimeMs = 6;
+}
+
+message VariableWidthPoint {
+  float position = 1;
+  float ascent = 2;
+  float descent = 3;
+  int segmentId = 4;
+}
+
+message PrototypeSelectedState {
+  GUID nodeID = 1;
+  PrototypeSelectedStateType stateType = 2;
+  GUID selectGUID = 3;
+  PrototypeStateAction stateAction = 4;
+}
+
+message PrototypeStateChange {
+  PrototypeStateAction targetStateAction = 1;
+  PrototypeSelectedState[] selectedStates = 2;
+}
+
+message PrototypeAction {
+  GUID transitionNodeID = 1;
+  TransitionType transitionType = 2;
+  float transitionDuration = 3;
+  EasingType easingType = 4;
+  bool transitionShouldSmartAnimate = 5;
+  ConnectionType connectionType = 6;
+  string connectionURL = 7;
+  Vector overlayRelativePosition = 8;
+  NavigationType navigationType = 9;
+  bool transitionPreserveScroll = 10;
+  float[] easingFunction = 11;
+  OverflowType overflowType = 12;
+  Vector extraScrollOffset = 13;
+  PrototypeShowHide showHide = 14;
+  ProdAdjustSize adjustSize = 15;
+  ProdMoving moving = 16;
+  string dynamicPanelStateStr = 17;
+  ProdRotate rotation = 18;
+  float waitingTime = 19;
+  bool isLooping = 20;
+  float loopingDuration = 21;
+  PrototypeVariableTarget targetVariable = 22;
+  VariableData targetVariableData = 23;
+  AssetID targetVariableSetID = 24;
+  GUID targetVariableModeID = 25;
+  ConditionalActions[] conditionalActions = 26;
+  bool transitionResetVideoPosition = 27;
+  bool transitionResetScrollPosition = 28;
+  bool transitionResetInteractiveComponents = 29;
+  bool DisplayTopLevel = 30;
+  float mediaSkipToTime = 31;
+  float mediaSkipByAmount = 32;
+  MediaAction mediaAction = 33;
+  PrototypeStateChange stateChange = 34;
+}
+
+message PrototypeEvent {
+  InteractionType interactionType = 1;
+  bool interactionMaintained = 2;
+  float interactionDuration = 3;
+  KeyTrigger keyTrigger = 4;
+  string voiceEventPhrase = 5;
+  float transitionTimeout = 6;
+}
+
+message ComponentPropDef {
+  GUID id = 1;
+  string name = 2;
+  ComponentPropValue initialValue = 3;
+  string sortPosition = 4;
+  GUID parentPropDefId = 5;
+  ComponentPropType type = 6;
+  ComponentPropPreferredValues preferredValues = 7;
+  bool isDeleted = 8;
+  VariableData varValue = 9;
+  string aliasName = 10;
+}
+
+message ComponentPropRef {
+  GUID defID = 1;
+  string zombieFallbackName = 2;
+  ComponentPropNodeField componentPropNodeField = 3;
+  uint nodeField = 4;
+  bool isDeleted = 5;
+}
+
+message ComponentPropValue {
+  TextData textValue = 1;
+  GUID guidValue = 2;
+  bool boolValue = 3;
+}
+
+message InstanceSwapPreferredValue {
+  InstanceSwapPreferredValueType type = 1;
+  string key = 2;
+}
+
+message ComponentPropPreferredValues {
+  string[] stringValues = 1;
+  InstanceSwapPreferredValue[] instanceSwapValues = 2;
+}
+
+message ComponentPropAssignment {
+  GUID defID = 1;
+  ComponentPropValue value = 2;
+  VariableData varValue = 3;
+}
+
+message Blob {
+  byte[] bytes = 1;
+}
+
+message PixsoNode {
+  GUID guid = 1;
+  GUIDPath guidPath = 2;
+  ParentIndex parentIndex = 3;
+  NodePhase phase = 4;
+  Matrix transform = 5;
+  NodeType type = 6;
+  string name = 7;
+  VectorData vectorData = 8;
+  string version = 9;
+  bool visible = 10;
+  int count = 11;
+  Vector size = 12;
+  BooleanOperation booleanOperation = 13;
+  ArcData arcData = 14;
+  BlendMode blendMode = 15;
+  float cornerRadius = 16;
+  float cornerSmoothing = 17;
+  float opacity = 18;
+  bool locked = 19;
+  Effect[] effects = 20;
+  Path[] fillGeometry = 21;
+  Paint[] fillPaints = 22;
+  float[] dashPattern = 23;
+  StackCounterAlign stackCounterAlign = 24;
+  StackSize stackCounterSizing = 25;
+  StackSize stackHeight = 26;
+  float stackHorizontalPadding = 27;
+  StackJustify stackJustify = 28;
+  StackMode stackMode = 29;
+  float stackPadding = 30;
+  float stackSpacing = 31;
+  float stackVerticalPadding = 32;
+  StackSize stackWidth = 33;
+  StrokeAlign strokeAlign = 34;
+  StrokeCap strokeCap = 35;
+  Path[] strokeGeometry = 36;
+  StrokeJoin strokeJoin = 37;
+  Paint[] strokePaints = 38;
+  float strokeWeight = 39;
+  string styleDescription = 40;
+  int styleID = 41;
+  StyleType styleType = 42;
+  SymbolData symbolData = 43;
+  string symbolDescription = 44;
+  LayoutGrid[] layoutGrids = 45;
+  bool mask = 46;
+  bool maskIsOutline = 47;
+  float starInnerScale = 48;
+  float miterLimit = 49;
+  Color backgroundColor = 50;
+  bool backgroundEnabled = 51;
+  float backgroundOpacity = 52;
+  Paint[] backgroundPaints = 53;
+  bool exportBackgroundDisabled = 54;
+  bool exportContentsOnly = 55;
+  ExportSettings[] exportSettings = 56;
+  bool exportTextAsSVGText = 57;
+  FontName fontName = 58;
+  float fontSize = 59;
+  string fontVersion = 60;
+  float paragraphIndent = 61;
+  float paragraphSpacing = 62;
+  TextAlignHorizontal textAlignHorizontal = 63;
+  TextAlignVertical textAlignVertical = 64;
+  TextAutoResize textAutoResize = 65;
+  TextCase textCase = 66;
+  TextData textData = 67;
+  TextDecoration textDecoration = 68;
+  float textTracking = 69;
+  int textUserLayoutVersion = 70;
+  Number letterSpacing = 71;
+  Number lineHeight = 72;
+  ConstraintType horizontalConstraint = 73;
+  ConstraintType verticalConstraint = 74;
+  PixsoNode[] derivedSymbolData = 75;
+  int derivedSymbolDataLayoutVersion = 76;
+  string componentKey = 77;
+  GUID inheritEffectStyleID = 78;
+  GUID inheritExportStyleID = 79;
+  GUID inheritFillStyleID = 80;
+  GUID inheritFillStyleIDForBackground = 81;
+  GUID inheritFillStyleIDForStroke = 82;
+  GUID inheritGridStyleID = 83;
+  GUID inheritStrokeStyleID = 84;
+  GUID inheritTextStyleID = 85;
+  float interactionDuration = 86;
+  bool interactionMaintained = 87;
+  GUID overriddenSymbolID = 88;
+  GUID overrideKey = 89;
+  KeyTrigger keyTrigger = 90;
+  NavigationType navigationType = 91;
+  InteractionType interactionType = 92;
+  ConnectionType connectionType = 93;
+  string connectionURL = 94;
+  EasingType easingType = 95;
+  bool proportionsConstrained = 96;
+  Color prototypeBackgroundColor = 97;
+  PrototypeDevice prototypeDevice = 98;
+  PrototypeInteraction[] prototypeInteractions = 99;
+  GUID prototypeStartNodeID = 100;
+  OverlayBackgroundAppearance overlayBackgroundAppearance = 101;
+  OverlayBackgroundInteraction overlayBackgroundInteraction = 102;
+  OverlayPositionType overlayPositionType = 103;
+  Vector overlayRelativePosition = 104;
+  float transitionDuration = 105;
+  GUID transitionNodeID = 106;
+  bool transitionPreserveScroll = 107;
+  bool transitionShouldSmartAnimate = 108;
+  float transitionTimeout = 109;
+  TransitionType transitionType = 110;
+  ScrollBehavior scrollBehavior = 111;
+  ScrollDirection scrollDirection = 112;
+  float rectangleBottomLeftCornerRadius = 113;
+  float rectangleBottomRightCornerRadius = 114;
+  bool rectangleCornerRadiiIndependent = 115;
+  bool rectangleCornerToolIndependent = 116;
+  float rectangleTopLeftCornerRadius = 117;
+  float rectangleTopRightCornerRadius = 118;
+  bool frameMaskDisabled = 119;
+  Hyperlink hyperlink = 120;
+  SharedStyleMasterData sharedStyleMasterData = 121;
+  SharedStyleReference sharedStyleReference = 122;
+  bool autoRename = 123;
+  VectorMirror handleMirroring = 124;
+  bool internalOnly = 125;
+  bool isSoftDeletedStyle = 126;
+  bool isNonUpdateable = 127;
+  bool isPublishable = 128;
+  string publishFile = 129;
+  GUID publishID = 130;
+  string publishedVersion = 131;
+  bool isSymbolPublishable = 132;
+  string sharedSymbolVersion = 133;
+  GUID[] ancestorPathBeforeDeletion = 134;
+  Guide[] guides = 135;
+  PropValueData[] stateGroupPropertyValueOrders = 136;
+  bool isStateGroup = 137;
+  float stackPaddingRight = 138;
+  float stackPaddingLeft = 139;
+  float stackPaddingTop = 140;
+  float stackPaddingBottom = 141;
+  StackSize stackPrimarySizing = 142;
+  StackSize stackChildPrimarySizing = 143;
+  StackSize stackChildCounterSizing = 144;
+  StackAlignItemMode stackPrimaryAlignItems = 145;
+  StackAlignItemMode stackCounterAlignItems = 146;
+  PrototypeStartPoint prototypeStartPt = 147;
+  StrokeCap dashCap = 148;
+  ConnectLineInfo connectlineInfo = 149;
+  ObjSnapConnline[] objSnapConnline = 150;
+  ConnlineTextInfo[] connlineTextInfos = 151;
+  VectorPaint[] vectorPaints = 152;
+  VectorStyle[] vectorStyles = 153;
+  float borderTopWeight = 154;
+  float borderBottomWeight = 155;
+  float borderLeftWeight = 156;
+  float borderRightWeight = 157;
+  bool borderStrokeWeightsIndependent = 158;
+  PluginData[] pluginData = 159;
+  bool showInSlice = 160;
+  ExportImageQualityOp exportImageQuality = 161;
+  Path[] strokePaddingPath = 162;
+  bool autoLayoutAbsolutePos = 163;
+  bool autoLayoutItemReverseDraw = 164;
+  PluginRelaunchData[] pluginRelaunchData = 165;
+  bool autoLayoutIncludeBorders = 166;
+  ProdMode prodMode = 167;
+  bool exportCutPix = 168;
+  bool exportKeepNameGroup = 169;
+  TextTruncation textTruncation = 170;
+  MaskType maskType = 171;
+  LeadingTrim leadingTrim = 172;
+  bool hangingPunctuation = 173;
+  bool hangingList = 174;
+  FontVariantNumericFigure fontVariantNumericFigure = 175;
+  FontVariantNumericSpacing fontVariantNumericSpacing = 176;
+  FontVariantNumericFraction fontVariantNumericFraction = 177;
+  FontVariantPosition fontVariantPosition = 178;
+  OpenTypeFeature[] toggledOnOTFeatures = 179;
+  OpenTypeFeature[] toggledOffOTFeatures = 180;
+  int maxLines = 181;
+  WorkState sectionState = 182;
+  EditInfo editInfo = 183;
+  float stackCounterSpacing = 184;
+  StackAlign stackCounterAlignContent = 185;
+  WrapMode stackWrap = 186;
+  Vector minSize = 187;
+  Vector maxSize = 188;
+  ComponentPropDef[] componentPropDef = 189;
+  ComponentPropRef[] componentPropRef = 190;
+  ComponentPropAssignment[] componentPropAssignment = 191;
+  SymbolLink[] symbolLinks = 192;
+  string description = 193;
+  bool exportNameByVariantProp = 194;
+  bool propsAreBubbled = 195;
+  bool showMask = 196;
+  bool componentOverrideHierarchy = 197;
+  DeveloperRelatedLink[] developerRelatedLinks = 198;
+  FontVariation[] fontVariations = 199;
+  PathTextInfo pathTextInfo = 200;
+  bool detachOpticalSizeFromFontSize = 201;
+  RadialRepeatData radialRepeatData = 202;
+  int overrideLevel = 203;
+  VariableData variableData = 204;
+  VariableDataMap variableConsumptionMap = 205;
+  VariableModeBySetMap variableModeBySetMap = 206;
+  VariableSetMode[] variableSetModes = 207;
+  AssetID variableSetID = 208;
+  VariableResolvedDataType variableResolvedType = 209;
+  VariableDataValues variableDataValues = 210;
+  string variableTokenName = 211;
+  VariableScope[] variableScopes = 212;
+  CodeSyntaxMap codeSyntax = 213;
+  AssetID backingVariableSetId = 214;
+  VariableIdOrVariableOverrideId backingVariableId = 215;
+  string rootVariableKey = 216;
+  string userFacingVersion = 217;
+  string key = 218;
+  bool isSoftDeleted = 219;
+  string sortPosition = 220;
+  string sourceLibraryKey = 221;
+  DeliverInfo deliverInfo = 222;
+  Matrix3f deformationTransform = 223;
+  TransformModifier[] transformModifiers = 224;
+  bool groupIncludeInvisible = 225;
+  GUID variableSymbolID = 226;
+  Annotation[] annotations = 227;
+  AnnotationCategories annotationCategories = 228;
+  GUID gridRowAnchor = 229;
+  GUID gridColumnAnchor = 230;
+  uint gridRowSpan = 231;
+  uint gridColumnSpan = 232;
+  GridChildAlign gridChildVerticalAlign = 233;
+  GridChildAlign gridChildHorizontalAlign = 234;
+  GUID[] gridRows = 235;
+  GUID[] gridColumns = 236;
+  GridTrackSizing[] gridRowsSizing = 237;
+  GridTrackSizing[] gridColumnsSizing = 238;
+  bool autoCornerRadius = 239;
+  Vector targetAspectRatio = 240;
+  string aliasName = 241;
+  bool simplifyInstancePanels = 242;
+  Vector rotationOrigin = 243;
+  VideoPlayback videoPlayback = 244;
+  VariableWidthPoint[] variableWidths = 245;
+}
+
+message ProdMode {
+  ProdTextStyle textStyle = 1;
+  float navigationItemInterval = 2;
+  string prodContent = 3;
+  ParentIndex hostIndex = 4;
+  int tableRowCount = 5;
+  int tableColCount = 6;
+  GUID dropListOptionSelectID = 7;
+  bool dropListExpand = 8;
+  ProdTextStyle activeTextStyle = 9;
+  Vector tableSize = 10;
+  Paint tableCellFillPaint = 11;
+  Vector navigationItemSize = 12;
+  bool navigationOptionExpand = 13;
+  bool componentLibrarySwitch = 14;
+  ProdScoreBar scoreBar = 15;
+  float navigationItemRatio = 16;
+  ProdDragBar dragBar = 17;
+  ProdTableCell tableCell = 18;
+  int tableBorderStyle = 19;
+  int embeddedIconPositionFlag = 20;
+  float recordHeight = 21;
+  int selectForm = 22;
+  int layoutMethod = 23;
+  int layerPosition = 24;
+  ProdViewportOrientation viewportOrientation = 25;
+  NodeType[] vNodeType = 26;
+  string stringIconSVG = 27;
+  bool tableHeaderVisible = 28;
+  float recordWidth = 29;
+  int recodeCount = 30;
+  int selectIndex = 31;
+  ProdLayoutParam layoutParam = 32;
+  ProdBlockStyleType blockStyleType = 33;
+  float distance = 34;
+  bool hoverTrigger = 35;
+  bool fitContent = 36;
+  string stringIconName = 37;
+  ProdTwoDimChart twoDimChart = 38;
+  GUID[] extraGuids = 39;
+  bool tableSelectColVisible = 40;
+  ScrollBar frameScrollBarVisible = 41;
+  int checkBoxState = 42;
+  ComponentStateType componentState = 43;
+  bool iconSwitch = 44;
+  bool checkBoxSwitch = 45;
+  bool flodingSymbolSwitch = 46;
+  bool checkBoxHited = 47;
+  float layerlndent = 48;
+  int foldingSymbolType = 49;
+  GUID[] blockMarkerIds = 50;
+  BlockMarkerParams blockMarkerParams = 51;
+}
+
+message BlockMarkerParams {
+  GUID relatedMarkerId = 1;
+  MarkerSide markerSide = 2;
+  GUID boundNodeId = 3;
+  int markerIndex = 4;
+}
+
+message ProdLayoutParam {
+  ProdLayoutMode layoutMode = 1;
+  ProdLayoutSizeMode witdhMode = 2;
+  ProdLayoutSizeMode heightMode = 3;
+  ProdLayoutInterval margin = 4;
+  ProdLayoutInterval padding = 5;
+}
+
+message ProdLayoutInterval {
+  float left = 1;
+  float top = 2;
+  float right = 3;
+  float bottom = 4;
+}
+
+message ProdAdjustSize {
+  ProdAdjustSizeType adjustSizeType = 1;
+  ProdAdjustBaseType baseDirection = 2;
+  float width = 3;
+  float height = 4;
+  ProdAdjustUnitType widthUnit = 5;
+  ProdAdjustUnitType heightUnit = 6;
+}
+
+message ProdMoving {
+  ProdChangeLocationType adjustSizeType = 1;
+  float x = 2;
+  float y = 3;
+}
+
+message ProdRotate {
+  ProdRotationType rotationType = 1;
+  float anlge = 2;
+}
+
+message ProdTableCell {
+  int cellSizeRow = 1;
+  int cellSizeCol = 2;
+  GUID mergeToGuid = 3;
+  uint cellHAlign = 4;
+  uint cellVAlign = 5;
+}
+
+message ProdTextStyle {
+  FontName fontName = 1;
+  Paint fillPaint = 2;
+  float fontSize = 3;
+}
+
+message ProdScoreBar {
+  int numPath = 1;
+  float score = 2;
+  ProdScalingFactor scalingFactor = 3;
+}
+
+message ProdDragBar {
+  float radius = 1;
+  ProdScalingFactor scalingFactor = 2;
+}
+
+message ProdScalingFactor {
+  float wScalingFactor = 1;
+  float hScalingFactor = 2;
+}
+
+message ProdTDCElementinfo {
+  string firstVar = 1;
+  string secondVar = 2;
+  float value = 3;
+}
+
+message ProdTwoDimChart {
+  ProdTDCElementinfo[] TDCElementInfo = 1;
+  bool axisSwitch = 2;
+  bool gridSwitch = 3;
+  bool titleSwitch = 4;
+  bool legendSwitch = 5;
+  bool dataLableSwitch = 6;
+  bool dataWinSwitch = 7;
+  int legendDir = 8;
+  int colNum = 9;
+  int rowNum = 10;
+  int chartMode = 11;
+  float[] drawArea = 12;
+  float[] legendSymPos = 13;
+  float[] axisScale = 14;
+}
+
+message Guide {
+  Axis axis = 1;
+  float offset = 2;
+  GUID guid = 3;
+  float distance = 4;
+}
+
+message OverlayBackgroundAppearance {
+  OverlayBackgroundType backgroundType = 1;
+  Color backgroundColor = 2;
+}
+
+message Number {
+  float value = 1;
+  NumberUnits units = 2;
+}
+
+message ParentIndex {
+  GUID guid = 1;
+  string position = 2;
+}
+
+message UserInfo {
+  uint sessionID = 1;
+  bool connected = 2;
+  string name = 3;
+  Color color = 4;
+  string imageURL = 5;
+  Viewport viewport = 6;
+  Mouse mouse = 7;
+  GUID[] selection = 8;
+  uint[] observing = 9;
+  string deviceName = 10;
+  Click[] recentClicks = 11;
+  ScrollPosition[] scrollPositions = 12;
+  string userID = 13;
+  GUID lastTriggeredHotspot = 14;
+  GUID lastTriggeredPrototypeInteractionID = 15;
+  TriggeredOverlayData[] triggeredOverlaysData = 16;
+  Spotlight spotlight = 17;
+  GUID lastTriggeredFlowStartPointId = 18;
+}
+
+message Viewport {
+  Rect canvasSpaceBounds = 1;
+  bool pixelPreview = 2;
+  float pixelDensity = 3;
+  GUID canvasGuid = 4;
+}
+
+message Mouse {
+  MouseCursor cursor = 1;
+  Vector canvasSpaceLocation = 2;
+  Rect canvasSpaceSelectionBox = 3;
+  GUID canvasGuid = 4;
+}
+
+message Click {
+  uint id = 1;
+  Vector point = 2;
+}
+
+message ScrollPosition {
+  GUID node = 1;
+  Vector scrollOffset = 2;
+}
+
+message TriggeredOverlayData {
+  GUID overlayGuid = 1;
+  GUID hotspotGuid = 2;
+  GUID swapGuid = 3;
+  GUID prototypeInteractionGuid = 4;
+}
+
+message Hyperlink {
+  string url = 1;
+  GUID guid = 2;
+}
+
+message SharedStyleMasterData {
+  string styleKey = 1;
+  string sortPosition = 2;
+  string fileKey = 3;
+}
+
+message SharedStyleReference {
+  string styleKey = 1;
+  string versionHash = 2;
+}
+
+message PixsoMsg {
+  PixsoMsgType type = 1;
+  int sessionID = 2;
+  PixsoNode[] pixsoNodes = 3;
+  Blob[] blobs = 4;
+  int ackID = 5;
+  UserInfo[] userInfos = 6;
+  Access access = 7;
+  uint fileVersion = 8;
+  string styleSetName = 9;
+  StyleSetType styleSetType = 10;
+  StyleSetContentType styleSetContentType = 11;
+  GUID pastePageId = 12;
+  SceneGraphQuery[] sceneGraphQueries = 13;
+  string signalName = 14;
+  string signalPayload = 15;
+  string createVersion = 16;
+  string lastOpenVersion = 17;
+  CommandNum cmdNum = 18;
+  FileMeta fileMeta = 19;
+  string pasteFileKey = 20;
+}
+
+message VectorStyleData {
+  int styleID = 1;
+  float cornerRadius = 2;
+  StrokeCap strokeCap = 3;
+  StrokeJoin strokeJoin = 4;
+  VectorMirror handleMirroring = 5;
+}
+
+message TextStyleData {
+  int styleID = 1;
+  float fontSize = 2;
+  float paragraphIndent = 3;
+  float paragraphSpacing = 4;
+  Number letterSpacing = 5;
+  Number lineHeight = 6;
+  TextCase textCase = 7;
+  TextDecoration textDecoration = 8;
+  TextAlignHorizontal textAlignHorizontal = 9;
+  TextAlignVertical textAlignVertical = 10;
+  TextAutoResize textAutoResize = 11;
+  FontName fontName = 12;
+  Hyperlink hyperlink = 13;
+  Paint[] fillPaints = 14;
+  GUID inheritFillStyleID = 15;
+  GUID inheritTextStyleID = 16;
+  FontVariantNumericFigure fontVariantNumericFigure = 17;
+  FontVariantNumericSpacing fontVariantNumericSpacing = 18;
+  FontVariantNumericFraction fontVariantNumericFraction = 19;
+  FontVariantPosition fontVariantPosition = 20;
+  OpenTypeFeature[] toggledOnOTFeatures = 21;
+  OpenTypeFeature[] toggledOffOTFeatures = 22;
+  FontVariation[] fontVariations = 23;
+  bool detachOpticalSizeFromFontSize = 24;
+  VariableDataMap variableConsumptionMap = 25;
+}
+
+message PropValueData {
+  string property = 1;
+  string[] values = 2;
+  string aliasProperty = 3;
+  string[] aliasValues = 4;
+}
+
+message SceneGraphQuery {
+  int depth = 1;
+  GUID startingNode = 2;
+}
+
+message PrototypeStartPoint {
+  string description = 1;
+  string name = 2;
+  string position = 3;
+}
+
+message ConnectLineInfo {
+  ConnectLineType connlineType = 1;
+  bool isFree = 2;
+  GUID[] connlineSnapObj = 3;
+  ConnLineTextAngleType textAngleType = 4;
+}
+
+message ObjSnapConnline {
+  GUID guid = 1;
+  ConnectPointType connectPointType = 2;
+  SnapToObjType snapToObjType = 3;
+  Vector rate = 4;
+}
+
+message ConnlineTextInfo {
+  GUID textGuid = 1;
+  float rate = 2;
+}
+
+message VectorPaint {
+  int regionId = 1;
+  Paint[] paints = 2;
+}
+
+message VectorStyle {
+  int regionId = 1;
+  GUID id = 2;
+}
+
+message PluginData {
+  string pluginID = 1;
+  string value = 2;
+  string key = 3;
+}
+
+message PluginRelaunchData {
+  string pluginID = 1;
+  string message = 2;
+  string command = 3;
+  bool isDeleted = 4;
+}
+
+message PlaceHolder {
+  int[] emojiCodePoints = 1;
+  Rect bound = 2;
+  int firstCharacter = 3;
+  GlyphPose pose = 4;
+}
+
+message Spotlight {
+  uint sessionID = 1;
+  string userID = 2;
+}
+
+message FileMeta {
+  FileSource fileSource = 1;
+  FontIncorrect fontIncorrect = 2;
+}
+
+message EditInfo {
+  string userID = 1;
+  uint lastEditedAt = 2;
+  uint createAt = 3;
+}
+
+message SymbolLink {
+  string uri = 1;
+  string displayName = 2;
+  string displayText = 3;
+}
+
+message DeveloperRelatedLink {
+  string linkName = 1;
+  string linkUrl = 2;
+}
+
+message FontVariation {
+  uint axisTag = 1;
+  string axisName = 2;
+  float value = 3;
+}
+
+message PathTextInfo {
+  bool flipGlyphs = 1;
+  bool reverse = 2;
+  float hOffset = 3;
+  float vOffset = 4;
+  float tValue = 5;
+}
+
+message GlyphPose {
+  float x = 1;
+  float y = 2;
+  float angle = 3;
+}
+
+message RadialRepeatData {
+  int copies = 1;
+  float radius = 2;
+}
+
+message TransformModifier {
+  TransformModifierType type = 1;
+  Vector offset = 2;
+  bool visible = 3;
+  uint count = 4;
+  RepeatType repeatType = 5;
+  Axis axis = 6;
+  UnitType unitType = 7;
+  RepeatOrder order = 8;
+}
+
+message AssetID {
+  GUID guid = 1;
+  AssetRef assetRef = 2;
+}
+
+message VariableSetMode {
+  GUID id = 1;
+  string name = 2;
+  string sortPosition = 3;
+}
+
+message VariableDataValues {
+  VariableDataValuesEntry[] entries = 1;
+}
+
+message VariableDataValuesEntry {
+  GUID modeID = 1;
+  VariableData variableData = 2;
+}
+
+message VariableDataMap {
+  VariableDataMapEntry[] entries = 1;
+}
+
+message VariableDataMapEntry {
+  uint nodeField = 1;
+  VariableData variableData = 2;
+  VariableField variableField = 3;
+}
+
+message VariableData {
+  VariableAnyValue value = 1;
+  VariableDataType dataType = 2;
+  VariableResolvedDataType resolvedDataType = 3;
+}
+
+message VariableAnyValue {
+  bool boolValue = 1;
+  string textValue = 2;
+  float floatValue = 3;
+  AssetID alias = 4;
+  Color colorValue = 5;
+  Expression expressionValue = 6;
+  VariableMap mapValue = 7;
+  AssetID symbolIdValue = 8;
+  VariableFontStyle fontStyleValue = 9;
+  TextData textDataValue = 10;
+  NodeFieldAlias nodeFieldAliasValue = 11;
+}
+
+message Expression {
+  ExpressionFunction expressionFunction = 1;
+  VariableData[] expressionArguments = 2;
+}
+
+message AssetRef {
+  string key = 1;
+  string version = 2;
+}
+
+message VariableFontStyle {
+  VariableData asString = 1;
+  VariableData asFloat = 2;
+}
+
+message VariableMap {
+  VariableMapValue[] values = 1;
+}
+
+message ColorStopVar {
+  Color color = 1;
+  VariableData colorVar = 2;
+  float position = 3;
+}
+
+message VariableModeBySetMap {
+  VariableModeBySetMapEntry[] entries = 1;
+}
+
+message VariableModeBySetMapEntry {
+  AssetID variableSetID = 1;
+  GUID variableModeID = 2;
+}
+
+message VariableMapValue {
+  string key = 1;
+  VariableData value = 2;
+}
+
+message VariableIdOrVariableOverrideId {
+  AssetID variableId = 1;
+  VariableOverrideId variableOverrideId = 2;
+}
+
+message VariableOverrideId {
+  GUID guid = 1;
+  AssetRef assetRef = 2;
+}
+
+message PrototypeVariableTarget {
+  AssetID id = 1;
+  NodeFieldAlias nodeFieldAlias = 2;
+}
+
+message TriggeredSetVariableActionData {
+  GUID nodeForFindingTopmostScreenId = 1;
+  string targetVariableId = 2;
+  string targetVariableData = 3;
+  string resolvedVariableModes = 4;
+}
+
+message TriggeredSetVariableModeActionData {
+  GUID nodeForFindingTopmostScreenId = 1;
+  string targetVariableSetKey = 2;
+  string targetVariableModeId = 3;
+  AssetID targetVariableSetId = 4;
+}
+
+message NodeFieldAlias {
+  GUIDPath stablePathToNode = 1;
+  NodeFieldAliasType nodeField = 2;
+  string indexOrKey = 3;
+}
+
+message CodeSyntaxMap {
+  CodeSyntaxMapEntry[] entries = 1;
+}
+
+message CodeSyntaxMapEntry {
+  CodeSyntaxPlatform platform = 1;
+  string value = 2;
+}
+
+message DeliverInfo {
+  string publishedVersion = 1;
+  string currentVersion = 2;
+}
+
+message AnnotationProperty {
+  AnnotationPropertyType type = 1;
+}
+
+message AnnotationCategoryCustom {
+  Color color = 1;
+  string label = 2;
+}
+
+message AnnotationCategory {
+  GUID id = 1;
+  AnnotationCategoryPreset preset = 2;
+  AnnotationCategoryCustom custom = 3;
+}
+
+message AnnotationCategories {
+  AnnotationCategory[] items = 1;
+}
+
+message Annotation {
+  string label = 1;
+  AnnotationProperty[] properties = 2;
+  GUID categoryId = 3;
+}
+
+enum PixsoMsgType {
+  JOIN_START = 1;
+  NODE_CHANGES = 2;
+  USER_CHANGES = 3;
+  JOIN_END = 4;
+  SIGNAL = 5;
+  STYLE = 6;
+  STYLE_SET = 7;
+  JOIN_START_SKIP_RELOAD = 8;
+  NOTIFY_SHOULD_UPGRADE = 9;
+  UPGRADE_DONE = 10;
+  UPGRADE_REFRESH = 11;
+  SCENE_GRAPH_QUERY = 12;
+  SCENE_GRAPH_REPLY = 13;
+  FIC_DOCUMENT = 14;
+  UPDATE_VERSION = 15;
+  PIX_DOCUMENT = 16;
+  SPOTLIGHT_OPEN = 17;
+  SPOTLIGHT_CLOSE = 18;
+  COMPONENT_QUERY = 19;
+  COMPONENT_REPLY = 20;
+}
+
+enum NodePhase {
+  MODIFY = 0;
+  CREATED = 1;
+  REMOVED = 2;
+}
+
+enum NodeType {
+  NONE = 1;
+  DOCUMENT = 2;
+  CANVAS = 3;
+  GROUP = 4;
+  FRAME = 5;
+  BOOLEAN_OPERATION = 6;
+  VECTOR = 7;
+  STAR = 8;
+  LINE = 9;
+  ELLIPSE = 10;
+  RECTANGLE = 11;
+  REGULAR_POLYGON = 12;
+  ROUNDED_RECTANGLE = 13;
+  TEXT = 14;
+  SLICE = 15;
+  SYMBOL = 16;
+  INSTANCE = 17;
+  CONNECTLINE = 18;
+  DIRECTORY = 19;
+  PROD_RECTANGLE = 20;
+  PROD_ELLIPSE = 21;
+  PROD_STAT = 22;
+  PROD_POLYGON = 23;
+  PROD_DROPDOWNBOX = 24;
+  PROD_EMBEDDEDSVGICON = 25;
+  PROD_SIDEMENU = 26;
+  PROD_LISTMENU = 27;
+  PROD_FIRSTNAVIGATIONBAR = 28;
+  PROD_SECONDNAVIGATIONBAR = 29;
+  PROD_LEFTNAVIGATIONBAR = 30;
+  PROD_DOWNNAVIGATIONBAR = 31;
+  PROD_TABLE = 32;
+  PROD_TABLECELL = 33;
+  PROD_NAVIGATIONBARITEM = 34;
+  PROD_LISTOPTION = 35;
+  PROD_LINE = 36;
+  PROD_TEXT = 37;
+  PROD_NAVIGATIONBAROPTION = 38;
+  PROD_MENUOPTION = 39;
+  PROD_RADIOICONNODE = 40;
+  PROD_PLACEHOLDER = 41;
+  PROD_IMAGEPLACEHOLDER = 42;
+  PROD_PRIMARYBUTTON = 43;
+  PROD_BUTTON = 44;
+  PROD_CHECKBOX = 45;
+  PROD_RADIO = 46;
+  PROD_SWITCH = 47;
+  PROD_TEXTALERT = 48;
+  PROD_SEARCHBOX = 49;
+  PROD_INPUTBOX = 50;
+  PROD_PASSWORDINPUTBOX = 51;
+  PROD_ICONLIST = 52;
+  PROD_SWITCHLIST = 53;
+  PROD_TOAST = 54;
+  PROD_ALERT = 55;
+  PROD_INPUTALERT = 56;
+  PROD_BOTTONALERT = 57;
+  PROD_CARD = 58;
+  PROD_LARGECARD = 59;
+  PROD_MASK = 60;
+  PROD_STATESBAR = 61;
+  PROD_TITLESBAR = 62;
+  PROD_IMAGE = 63;
+  PROD_TITLESBAR2 = 64;
+  PROD_THREEBUTTONSALERT = 65;
+  PROD_TICKALERT = 66;
+  PROD_INPUTRANGESEARCH = 67;
+  PROD_INPUTDROP = 68;
+  PROD_INPUTDATA = 69;
+  PROD_INPUTMULROW = 70;
+  PROD_INPUTVERIFICATION = 71;
+  PROD_MENUOPTIONECOMPONENT = 72;
+  PROD_SIDENAVIGATBAR = 73;
+  PROD_DATASELECTOR = 74;
+  PROD_PAGERCOMPONENT = 75;
+  PROD_STEPPER = 76;
+  PROD_MAPCOMPONENT = 77;
+  PROD_HISTOGRAM = 78;
+  PROD_PIECHART = 79;
+  PROD_LINECHART = 80;
+  PROD_ICONBUTTON = 81;
+  PROD_MOREBUTTON = 82;
+  PROD_SCOREBAR = 83;
+  PROD_PROCESSBAR = 84;
+  PROD_DRAGBAR = 85;
+  PROD_SVGFRAME = 86;
+  PROD_LARGECARD3 = 87;
+  PROD_LARGECARD4 = 88;
+  PROD_TOASTLOADING = 89;
+  PROD_SIDENAVIGATBAR2 = 90;
+  PROD_PAGERCOMPONENT2 = 91;
+  PROD_ITEMTABLE = 92;
+  PROD_LABEL = 93;
+  PROD_TOASTSUCCESSPC = 94;
+  PROD_TOASTDEFEATERPC = 95;
+  PROD_TOASTWARNPC = 96;
+  PROD_TOASTNOTICEPC = 97;
+  PROD_TOASTLOADINGPC = 98;
+  PROD_TOASTSINGLEBUTTONPC = 99;
+  PROD_TOASTDOUBLEBUTTONPC = 100;
+  PROD_TOASTTIPSPC = 101;
+  PROD_PLUSNAVIGATBAR = 102;
+  PROD_STEPPER2 = 103;
+  SECTION = 104;
+  PROD_BREADCRUMB = 105;
+  PROD_BREADCRUMBITEM = 106;
+  PROD_IBUTTON = 107;
+  PROD_IPLACEHOLDER = 108;
+  PROD_IMASK = 109;
+  PROD_ISTATUSBAR = 110;
+  PROD_IINPUTBOX = 111;
+  PROD_IRADIOANDCHECKBUTTON = 112;
+  PROD_IRADIOBUTTON = 113;
+  PROD_ISTEPPER = 114;
+  PROD_VIEWPORTTEXT = 115;
+  PROD_RECTBOX = 116;
+  PROD_SELECTBOX = 117;
+  PROD_SELECTOPTION = 118;
+  PROD_SMARTTABLE = 119;
+  PROD_SMARTTABLECELL = 120;
+  PROD_BLOCK = 121;
+  PROD_BLOCKDOCUMENT = 122;
+  PROD_TOPBARPC = 123;
+  PROD_TOPBARITEMPC = 124;
+  PROD_TOPBAROPTIONPC = 125;
+  PROD_TOPBARMD = 126;
+  PROD_DROPDOWNBOXSIMPLE = 127;
+  PROD_SELECTBOXSTYLE1 = 128;
+  PROD_LISTOPTIONMENU = 129;
+  PROD_SIDEBARPC = 130;
+  PROD_SIDEBARITEMPC = 131;
+  PROD_SIDEBAROPTIONPC = 132;
+  PROD_IPAGERCOMPONENT = 133;
+  PROD_SIDENBMD = 134;
+  PROD_SIDENBITEMMD = 135;
+  PROD_DOWNNBMD = 136;
+  PROD_DOWNNBITEMMD = 137;
+  PROD_LABELMD = 138;
+  PROD_LABELPC = 139;
+  PROD_LABELITEM = 140;
+  PROD_DYNAMICPANEL = 141;
+  PROD_DYNAMICPANELSTATE = 142;
+  PROD_HOTZONE = 143;
+  PROD_TAG = 144;
+  PROD_TAGITEM = 145;
+  PROD_AVATAR = 146;
+  PROD_HOTZONE_FIX = 147;
+  PROD_LEFTPANELSVGICON = 148;
+  PROD_BUBBLEPANEL = 149;
+  PROD_TWODIMCHART = 150;
+  PATH_TEXT = 151;
+  RADIAL_PATTERN = 152;
+  VARIABLE = 153;
+  VARIABLE_SET = 154;
+  TRANSFORM = 155;
+  PROD_TREE = 156;
+  PROD_TREEOPTION = 157;
+  PROD_BLOCKMARKER = 158;
+}
+
+enum MarkerSide {
+  BLOCKSIDE = 0;
+  TARGETSIDE = 1;
+}
+
+enum ProdLayoutMode {
+  NONE = 1;
+  LINEAR = 2;
+}
+
+enum ProdLayoutSizeMode {
+  FIXEDNUM = 1;
+  WRAPCONTENT = 2;
+  MATCHPARENT = 3;
+}
+
+enum ProdChangeLocationType {
+  MOVE = 1;
+  MOVETO = 2;
+}
+
+enum ProdRotationType {
+  ROTATE = 1;
+  ROTATETO = 2;
+}
+
+enum ProdAdjustSizeType {
+  ADJUST = 1;
+  ADJUSTTO = 2;
+}
+
+enum ProdAdjustBaseType {
+  LEFTTOP = 1;
+  TOP = 2;
+  RIGHTTOP = 3;
+  LEFT = 4;
+  CENTER = 5;
+  RIGHT = 6;
+  LEFTBOTTOM = 7;
+  BOTTOM = 8;
+  RIGHTBOTTOM = 9;
+}
+
+enum ProdAdjustUnitType {
+  PERCENTAGE = 1;
+  PIXEL = 2;
+}
+
+enum ProdViewportOrientation {
+  Horizontal = 1;
+  Vertical = 2;
+}
+
+enum ProdBlockStyleType {
+  DEFAULT = 0;
+  H1 = 1;
+  H2 = 2;
+  H3 = 3;
+}
+
+enum BooleanOperation {
+  UNION = 1;
+  INTERSECT = 2;
+  SUBTRACT = 3;
+  XOR = 4;
+}
+
+enum BlendMode {
+  PASS_THROUGH = 1;
+  NORMAL = 2;
+  DARKEN = 3;
+  MULTIPLY = 4;
+  LINEAR_BURN = 5;
+  COLOR_BURN = 6;
+  LIGHTEN = 7;
+  SCREEN = 8;
+  LINEAR_DODGE = 9;
+  COLOR_DODGE = 10;
+  OVERLAY = 11;
+  SOFT_LIGHT = 12;
+  HARD_LIGHT = 13;
+  DIFFERENCE = 14;
+  EXCLUSION = 15;
+  HUE = 16;
+  SATURATION = 17;
+  COLOR = 18;
+  LUMINOSITY = 19;
+}
+
+enum NoiseType {
+  MULTITONE = 0;
+  MONOTONE = 1;
+  DUOTONE = 2;
+}
+
+enum EffectType {
+  INNER_SHADOW = 1;
+  DROP_SHADOW = 2;
+  FOREGROUND_BLUR = 3;
+  BACKGROUND_BLUR = 4;
+  MOTION_BLUR = 5;
+  GLASS = 6;
+  GRAIN = 7;
+  NOISE = 8;
+  ZOOM_BLUR = 9;
+}
+
+enum StackCounterAlign {
+  MIN = 1;
+  CENTER = 2;
+  MAX = 3;
+  STRETCH = 4;
+}
+
+enum StackAlignItemMode {
+  MIN = 1;
+  CENTER = 2;
+  MAX = 3;
+  SPACE_EVENLY = 4;
+}
+
+enum StackSize {
+  FIXED = 1;
+  RESIZE_TO_FIT = 2;
+}
+
+enum StackJustify {
+  MIN = 1;
+  CENTER = 2;
+  MAX = 3;
+  SPACE_EVENLY = 4;
+}
+
+enum StackMode {
+  NONE = 1;
+  HORIZONTAL = 2;
+  VERTICAL = 3;
+  GRID = 4;
+}
+
+enum StrokeAlign {
+  CENTER = 1;
+  INSIDE = 2;
+  OUTSIDE = 3;
+}
+
+enum StrokeCap {
+  NONE = 1;
+  ROUND = 2;
+  SQUARE = 3;
+  ARROW_LINES = 4;
+  ARROW_EQUILATERAL = 5;
+  TRIANGLE_FILLED = 6;
+  DIAMOND_FILLED = 7;
+  HOLLOW_ROUND = 8;
+  SOLID_ROUND = 9;
+  VERTICAL_LINE = 10;
+}
+
+enum StrokeJoin {
+  MITER = 1;
+  BEVEL = 2;
+  ROUND = 3;
+}
+
+enum StyleType {
+  NONE = 1;
+  FILL = 2;
+  STROKE = 3;
+  TEXT = 4;
+  EFFECT = 5;
+  EXPORT = 6;
+  GRID = 7;
+}
+
+enum LayoutGridType {
+  MIN = 1;
+  CENTER = 2;
+  STRETCH = 3;
+  MAX = 4;
+}
+
+enum Axis {
+  X = 1;
+  Y = 2;
+}
+
+enum LayoutGridPattern {
+  STRIPES = 1;
+  GRID = 2;
+}
+
+enum GridChildAlign {
+  MIN = 1;
+  CENTER = 2;
+  MAX = 3;
+}
+
+enum GridTrackSizingType {
+  FLEX = 1;
+  FIXED = 2;
+}
+
+enum ImageType {
+  PNG = 1;
+  JPEG = 2;
+  SVG = 3;
+  PDF = 4;
+  SKETCH = 5;
+  EPS = 6;
+  TIFF = 7;
+  WEBP = 8;
+}
+
+enum ExportConstraintType {
+  CONTENT_SCALE = 1;
+  CONTENT_WIDTH = 2;
+  CONTENT_HEIGHT = 3;
+}
+
+enum ExportSVGIDMode {
+  IF_NEEDED = 1;
+  ALWAYS = 2;
+}
+
+enum FontVariantCaps {
+  NORMAL = 1;
+  SMALL = 2;
+  ALL_SMALL = 3;
+  PETITE = 4;
+  ALL_PETITE = 5;
+  UNICASE = 6;
+  TITLING = 7;
+}
+
+enum FontVariantNumericFigure {
+  NORMAL = 1;
+  LINING = 2;
+  OLDSTYLE = 3;
+}
+
+enum FontVariantNumericFraction {
+  NORMAL = 1;
+  DIAGONAL = 2;
+  STACKED = 3;
+}
+
+enum FontVariantNumericSpacing {
+  NORMAL = 1;
+  PROPORTIONAL = 2;
+  TABULAR = 3;
+}
+
+enum FontVariantPosition {
+  NORMAL = 1;
+  SUB = 2;
+  SUPER = 3;
+}
+
+enum TextAlignHorizontal {
+  LEFT = 1;
+  CENTER = 2;
+  RIGHT = 3;
+  JUSTIFIED = 4;
+}
+
+enum TextAlignVertical {
+  TOP = 1;
+  CENTER = 2;
+  BOTTOM = 3;
+}
+
+enum TextAutoResize {
+  NONE = 1;
+  WIDTH_AND_HEIGHT = 2;
+  HEIGHT = 3;
+}
+
+enum TextCase {
+  ORIGINAL = 1;
+  UPPER = 2;
+  LOWER = 3;
+  TITLE = 4;
+  SMALL_CAPS = 5;
+  SMALL_CAPS_FORCED = 6;
+}
+
+enum FontStyle {
+  NORMAL = 1;
+  ITALIC = 2;
+}
+
+enum TextDecoration {
+  NONE = 1;
+  UNDERLINE = 2;
+  STRIKETHROUGH = 3;
+}
+
+enum ConstraintType {
+  MIN = 1;
+  CENTER = 2;
+  MAX = 3;
+  STRETCH = 4;
+  SCALE = 5;
+  FIXED_MIN = 6;
+  FIXED_MAX = 7;
+}
+
+enum TriggerDevice {
+  KEYBOARD = 1;
+  UNKNOWN_CONTROLLER = 2;
+  XBOX_ONE = 3;
+  PS4 = 4;
+  SWITCH_PRO = 5;
+}
+
+enum InteractionType {
+  ON_CLICK = 1;
+  AFTER_TIMEOUT = 2;
+  MOUSE_IN = 3;
+  MOUSE_OUT = 4;
+  ON_HOVER = 5;
+  MOUSE_DOWN = 6;
+  MOUSE_UP = 7;
+  ON_PRESS = 8;
+  NONE = 9;
+  DRAG = 10;
+  ON_KEY_DOWN = 11;
+  ON_VOICE = 12;
+  ON_DOUBLECLICK = 13;
+  SIDE_LEFT = 14;
+  SIDE_RIGHT = 15;
+  SIDE_UP = 16;
+  SIDE_DOWN = 17;
+}
+
+enum ConnectionType {
+  NONE = 1;
+  INTERNAL_NODE = 2;
+  URL = 3;
+  BACK = 4;
+  CLOSE = 5;
+  SCROLLTO = 6;
+  SETSHOWHIDE = 7;
+  CHANGESIZE = 8;
+  CHANGELOCATION = 9;
+  CHANGEDYNAMICPANELSTATE = 10;
+  ROTATION = 11;
+  WAIT = 12;
+  UPDATE_MEDIA_RUNTIME = 13;
+  CONDITIONAL = 14;
+  SET_VARIABLE = 15;
+  SET_VARIABLE_MODE = 16;
+  SET_ENABLE_STATE = 17;
+  SET_SELECTED_STATE = 18;
+  SET_SWITCH_STATE = 19;
+}
+
+enum PrototypeStateAction {
+  TRUE_STATE = 1;
+  FALSE_STATE = 2;
+  TOGGLE = 3;
+}
+
+enum PrototypeSelectedStateType {
+  SELECT_GUID = 1;
+  SWITCH_STATUS = 2;
+  CHECKBOX_STATE = 3;
+}
+
+enum EasingType {
+  LINEAR = 1;
+  IN_CUBIC = 2;
+  OUT_CUBIC = 3;
+  INOUT_CUBIC = 4;
+  INBACK_CUBIC = 5;
+  OUTBACK_CUBIC = 6;
+  INOUTBACK_CUBIC = 7;
+  CUSTOM_CUBIC = 8;
+  NONE = 9;
+  SPRING = 10;
+  GENTLE_SPRING = 11;
+  CUSTOM_SPRING = 12;
+  SPRING_PRESET_ONE = 13;
+  SPRING_PRESET_TWO = 14;
+  SPRING_PRESET_THREE = 15;
+}
+
+enum PrototypeDeviceType {
+  NONE = 1;
+  PRESET = 2;
+  CUSTOM = 3;
+  PRESENTATION = 4;
+}
+
+enum PrototypeShowHide {
+  SHOW = 1;
+  HIDE = 2;
+  SWITCH = 3;
+}
+
+enum DeviceRotation {
+  NONE = 1;
+  CCW_90 = 2;
+}
+
+enum TransitionType {
+  INSTANT_TRANSITION = 1;
+  DISSOLVE = 2;
+  SMART_ANIMATE = 3;
+  SLIDE_FROM_LEFT = 4;
+  SLIDE_FROM_RIGHT = 5;
+  SLIDE_FROM_TOP = 6;
+  SLIDE_FROM_BOTTOM = 7;
+  PUSH_FROM_LEFT = 8;
+  PUSH_FROM_RIGHT = 9;
+  PUSH_FROM_TOP = 10;
+  PUSH_FROM_BOTTOM = 11;
+  MOVE_FROM_LEFT = 12;
+  MOVE_FROM_RIGHT = 13;
+  MOVE_FROM_TOP = 14;
+  MOVE_FROM_BOTTOM = 15;
+  SLIDE_OUT_TO_LEFT = 16;
+  SLIDE_OUT_TO_RIGHT = 17;
+  SLIDE_OUT_TO_TOP = 18;
+  SLIDE_OUT_TO_BOTTOM = 19;
+  MOVE_OUT_TO_LEFT = 20;
+  MOVE_OUT_TO_RIGHT = 21;
+  MOVE_OUT_TO_TOP = 22;
+  MOVE_OUT_TO_BOTTOM = 23;
+  MAGIC_MOVE = 24;
+  SCROLL_ANIMATE = 25;
+  LAYER_DISSOLVE = 26;
+}
+
+enum OverlayBackgroundInteraction {
+  NONE = 1;
+  CLOSE_ON_CLICK_OUTSIDE = 2;
+}
+
+enum OverlayBackgroundType {
+  NONE = 1;
+  SOLID_COLOR = 2;
+}
+
+enum OverlayPositionType {
+  CENTER = 1;
+  TOP_LEFT = 2;
+  TOP_CENTER = 3;
+  TOP_RIGHT = 4;
+  BOTTOM_LEFT = 5;
+  BOTTOM_CENTER = 6;
+  BOTTOM_RIGHT = 7;
+  MANUAL = 8;
+}
+
+enum ScrollDirection {
+  NONE = 1;
+  HORIZONTAL = 2;
+  VERTICAL = 3;
+  BOTH = 4;
+}
+
+enum NavigationType {
+  NAVIGATE = 1;
+  OVERLAY = 2;
+  SWAP = 3;
+  SWAP_STATE = 4;
+  SCROLL_TO = 5;
+  SHOW_HIDE = 6;
+}
+
+enum MediaAction {
+  PLAY = 1;
+  PAUSE = 2;
+  TOGGLE_PLAY_PAUSE = 3;
+  MUTE = 4;
+  UNMUTE = 5;
+  TOGGLE_MUTE_UNMUTE = 6;
+  SKIP_FORWARD = 7;
+  SKIP_BACKWARD = 8;
+  SKIP_TO = 9;
+}
+
+enum NumberUnits {
+  RAW = 1;
+  PIXELS = 2;
+  PERCENT = 3;
+}
+
+enum ScrollBehavior {
+  SCROLLS = 1;
+  FIXED_WHEN_CHILD_OF_SCROLLING_FRAME = 2;
+}
+
+enum PatternAlignment {
+  START = 0;
+  CENTER = 1;
+  END = 2;
+}
+
+enum PatternTileType {
+  RECTANGULAR = 0;
+  HORIZONTAL_HEXAGONAL = 1;
+  VERTICAL_HEXAGONAL = 2;
+}
+
+enum PaintType {
+  SOLID = 1;
+  GRADIENT_LINEAR = 2;
+  GRADIENT_RADIAL = 3;
+  GRADIENT_ANGULAR = 4;
+  GRADIENT_DIAMOND = 5;
+  IMAGE = 6;
+  EMOJI = 7;
+  GIF = 8;
+  VIDEO = 9;
+  PATTERN = 10;
+}
+
+enum ImageScaleMode {
+  STRETCH = 1;
+  FIT = 2;
+  FILL = 3;
+  TILE = 4;
+}
+
+enum ScrollBar {
+  AUTOSHOW = 1;
+  SHOW = 2;
+  HIDE = 3;
+}
+
+enum ComponentStateType {
+  DEFAULT_STATE = 0;
+  HOVER_STATE = 1;
+  ACTIVE_STATE = 2;
+  DISABLED_STATE = 3;
+}
+
+enum MouseCursor {
+  DEFAULT = 1;
+  CROSSHAIR = 2;
+  EYEDROPPER = 3;
+  HAND = 4;
+  PAINT_BUCKET = 5;
+  PEN = 6;
+  PENCIL = 7;
+}
+
+enum Access {
+  READ_ONLY = 1;
+  READ_WRITE = 2;
+}
+
+enum StyleSetType {
+  PERSONAL = 1;
+  TEAM = 2;
+  CUSTOM = 3;
+  FREQUENCY = 4;
+  TEMPORARY = 5;
+}
+
+enum StyleSetContentType {
+  SOLID = 1;
+  GRADIENT = 2;
+  IMAGE = 3;
+}
+
+enum WindingRule {
+  NONZERO = 1;
+  ODD = 2;
+  INVERSE_NONZERO = 3;
+  INVERSE_ODD = 4;
+}
+
+enum VectorMirror {
+  NONE = 1;
+  ANGLE = 2;
+  ANGLE_AND_LENGTH = 3;
+  RIGHT_ANGLE = 4;
+}
+
+enum OverflowType {
+  NONE = 1;
+  HORIZONTAL = 2;
+  VERTICAL = 3;
+  HORIZONTAL_AND_VERTICAL = 4;
+}
+
+enum ConnectLineType {
+  StraightLine = 1;
+  Curve = 2;
+  RightAngle = 3;
+  FilletPlotLine = 4;
+}
+
+enum ConnLineTextAngleType {
+  Horizontal = 1;
+  TangentAngle = 2;
+}
+
+enum ConnectPointType {
+  None = 1;
+  BeginPt = 2;
+  EndPt = 3;
+}
+
+enum SnapToObjType {
+  None = 1;
+  CenterPt = 2;
+  Outline = 3;
+  Vertex = 4;
+  Inside = 5;
+  WholeShape = 6;
+}
+
+enum ExportImageQualityOp {
+  ExportQuality_Origin = 1;
+  ExportQuality_High = 2;
+  ExportQuality_Mid = 3;
+  ExportQuality_Low = 4;
+}
+
+enum TextListStyle {
+  PLAIN = 0;
+  ORDERED_LIST = 1;
+  UNORDERED_LIST = 2;
+}
+
+enum TextTruncation {
+  DISABLED = 0;
+  ENDING = 1;
+}
+
+enum MaskType {
+  ALPHA = 0;
+  OUTLINE = 1;
+  LUMINANCE = 2;
+}
+
+enum LeadingTrim {
+  NONE = 0;
+  CAP_HEIGHT = 1;
+}
+
+enum OpenTypeFeature {
+  PCAP = 0;
+  C2PC = 1;
+  CASE = 2;
+  CPSP = 3;
+  TITL = 4;
+  UNIC = 5;
+  ZERO = 6;
+  SINF = 7;
+  ORDN = 8;
+  AFRC = 9;
+  DNOM = 10;
+  NUMR = 11;
+  LIGA = 12;
+  CLIG = 13;
+  DLIG = 14;
+  HLIG = 15;
+  RLIG = 16;
+  AALT = 17;
+  CALT = 18;
+  RCLT = 19;
+  SALT = 20;
+  RVRN = 21;
+  VERT = 22;
+  SWSH = 23;
+  CSWH = 24;
+  NALT = 25;
+  CCMP = 26;
+  STCH = 27;
+  HIST = 28;
+  SIZE = 29;
+  ORNM = 30;
+  ITAL = 31;
+  RAND = 32;
+  DTLS = 33;
+  FLAC = 34;
+  MGRK = 35;
+  SSTY = 36;
+  KERN = 37;
+  FWID = 38;
+  HWID = 39;
+  HALT = 40;
+  TWID = 41;
+  QWID = 42;
+  PWID = 43;
+  JUST = 44;
+  LFBD = 45;
+  OPBD = 46;
+  RTBD = 47;
+  PALT = 48;
+  PKNA = 49;
+  LTRA = 50;
+  LTRM = 51;
+  RTLA = 52;
+  RTLM = 53;
+  ABRV = 54;
+  ABVM = 55;
+  ABVS = 56;
+  VALT = 57;
+  VHAL = 58;
+  BLWF = 59;
+  BLWM = 60;
+  BLWS = 61;
+  AKHN = 62;
+  CJCT = 63;
+  CFAR = 64;
+  CPCT = 65;
+  CURS = 66;
+  DIST = 67;
+  EXPT = 68;
+  FALT = 69;
+  FINA = 70;
+  FIN2 = 71;
+  FIN3 = 72;
+  HALF = 73;
+  HALN = 74;
+  HKNA = 75;
+  HNGL = 76;
+  HOJO = 77;
+  INIT = 78;
+  ISOL = 79;
+  JP78 = 80;
+  JP83 = 81;
+  JP90 = 82;
+  JP04 = 83;
+  LJMO = 84;
+  LOCL = 85;
+  MARK = 86;
+  MEDI = 87;
+  MED2 = 88;
+  MKMK = 89;
+  NLCK = 90;
+  NUKT = 91;
+  PREF = 92;
+  PRES = 93;
+  VPAL = 94;
+  PSTF = 95;
+  PSTS = 96;
+  RKRF = 97;
+  RPHF = 98;
+  RUBY = 99;
+  SMPL = 100;
+  TJMO = 101;
+  TNAM = 102;
+  TRAD = 103;
+  VATU = 104;
+  VJMO = 105;
+  VKNA = 106;
+  VKRN = 107;
+  VRTR = 108;
+  VRT2 = 109;
+  SS01 = 110;
+  SS02 = 111;
+  SS03 = 112;
+  SS04 = 113;
+  SS05 = 114;
+  SS06 = 115;
+  SS07 = 116;
+  SS08 = 117;
+  SS09 = 118;
+  SS10 = 119;
+  SS11 = 120;
+  SS12 = 121;
+  SS13 = 122;
+  SS14 = 123;
+  SS15 = 124;
+  SS16 = 125;
+  SS17 = 126;
+  SS18 = 127;
+  SS19 = 128;
+  SS20 = 129;
+  CV01 = 130;
+  CV02 = 131;
+  CV03 = 132;
+  CV04 = 133;
+  CV05 = 134;
+  CV06 = 135;
+  CV07 = 136;
+  CV08 = 137;
+  CV09 = 138;
+  CV10 = 139;
+  CV11 = 140;
+  CV12 = 141;
+  CV13 = 142;
+  CV14 = 143;
+  CV15 = 144;
+  CV16 = 145;
+  CV17 = 146;
+  CV18 = 147;
+  CV19 = 148;
+  CV20 = 149;
+  CV21 = 150;
+  CV22 = 151;
+  CV23 = 152;
+  CV24 = 153;
+  CV25 = 154;
+  CV26 = 155;
+  CV27 = 156;
+  CV28 = 157;
+  CV29 = 158;
+  CV30 = 159;
+  CV31 = 160;
+  CV32 = 161;
+  CV33 = 162;
+  CV34 = 163;
+  CV35 = 164;
+  CV36 = 165;
+  CV37 = 166;
+  CV38 = 167;
+  CV39 = 168;
+  CV40 = 169;
+  CV41 = 170;
+  CV42 = 171;
+  CV43 = 172;
+  CV44 = 173;
+  CV45 = 174;
+  CV46 = 175;
+  CV47 = 176;
+  CV48 = 177;
+  CV49 = 178;
+  CV50 = 179;
+  CV51 = 180;
+  CV52 = 181;
+  CV53 = 182;
+  CV54 = 183;
+  CV55 = 184;
+  CV56 = 185;
+  CV57 = 186;
+  CV58 = 187;
+  CV59 = 188;
+  CV60 = 189;
+  CV61 = 190;
+  CV62 = 191;
+  CV63 = 192;
+  CV64 = 193;
+  CV65 = 194;
+  CV66 = 195;
+  CV67 = 196;
+  CV68 = 197;
+  CV69 = 198;
+  CV70 = 199;
+  CV71 = 200;
+  CV72 = 201;
+  CV73 = 202;
+  CV74 = 203;
+  CV75 = 204;
+  CV76 = 205;
+  CV77 = 206;
+  CV78 = 207;
+  CV79 = 208;
+  CV80 = 209;
+  CV81 = 210;
+  CV82 = 211;
+  CV83 = 212;
+  CV84 = 213;
+  CV85 = 214;
+  CV86 = 215;
+  CV87 = 216;
+  CV88 = 217;
+  CV89 = 218;
+  CV90 = 219;
+  CV91 = 220;
+  CV92 = 221;
+  CV93 = 222;
+  CV94 = 223;
+  CV95 = 224;
+  CV96 = 225;
+  CV97 = 226;
+  CV98 = 227;
+  CV99 = 228;
+}
+
+enum InstanceSwapPreferredValueType {
+  COMPONENT = 0;
+  STATE_GROUP = 1;
+}
+
+enum ComponentPropType {
+  BOOL = 0;
+  TEXT = 1;
+  COLOR = 2;
+  INSTANCE_SWAP = 3;
+}
+
+enum ComponentPropNodeField {
+  VISIBLE = 0;
+  TEXT_DATA = 1;
+  OVERRIDDEN_SYMBOL_ID = 2;
+  INHERIT_FILL_STYLE_ID = 3;
+}
+
+enum FileSource {
+  PixDoc = 0;
+  Figma = 1;
+  Sketch = 2;
+  Axure = 3;
+  XD = 4;
+  MG = 5;
+}
+
+enum FontIncorrect {
+  None = 0;
+  ImportDoc = 1;
+}
+
+enum WorkState {
+  ORIGIN = 0;
+  DESIGN = 1;
+  DEV = 2;
+}
+
+enum WrapMode {
+  NO_WRAP = 0;
+  WRAP = 1;
+}
+
+enum StackAlign {
+  AUTO = 0;
+  SPACE_BETWEEN = 1;
+}
+
+enum Directionality {
+  AUTO = 0;
+  LTR = 1;
+  RTL = 2;
+}
+
+enum VariableDataType {
+  BOOLEAN = 0;
+  FLOAT = 1;
+  STRING = 2;
+  ALIAS = 3;
+  COLOR = 4;
+  EXPRESSION = 5;
+  MAP = 6;
+  SYMBOL_ID = 7;
+  FONT_STYLE = 8;
+  TEXT_DATA = 9;
+  INVALID = 10;
+  NODE_FIELD_ALIAS = 11;
+}
+
+enum VariableResolvedDataType {
+  BOOLEAN = 0;
+  FLOAT = 1;
+  STRING = 2;
+  COLOR = 4;
+  MAP = 5;
+  SYMBOL_ID = 6;
+  FONT_STYLE = 7;
+  TEXT_DATA = 8;
+}
+
+enum VariableField {
+  MISSING = 0;
+  CORNER_RADIUS = 1;
+  PARAGRAPH_SPACING = 2;
+  PARAGRAPH_INDENT = 3;
+  STROKE_WEIGHT = 4;
+  STACK_SPACING = 5;
+  STACK_PADDING_LEFT = 6;
+  STACK_PADDING_TOP = 7;
+  STACK_PADDING_RIGHT = 8;
+  STACK_PADDING_BOTTOM = 9;
+  VISIBLE = 10;
+  TEXT_DATA = 11;
+  WIDTH = 12;
+  HEIGHT = 13;
+  RECTANGLE_TOP_LEFT_CORNER_RADIUS = 14;
+  RECTANGLE_TOP_RIGHT_CORNER_RADIUS = 15;
+  RECTANGLE_BOTTOM_LEFT_CORNER_RADIUS = 16;
+  RECTANGLE_BOTTOM_RIGHT_CORNER_RADIUS = 17;
+  BORDER_TOP_WEIGHT = 18;
+  BORDER_BOTTOM_WEIGHT = 19;
+  BORDER_LEFT_WEIGHT = 20;
+  BORDER_RIGHT_WEIGHT = 21;
+  VARIANT_PROPERTIES = 22;
+  STACK_COUNTER_SPACING = 23;
+  MIN_WIDTH = 24;
+  MAX_WIDTH = 25;
+  MIN_HEIGHT = 26;
+  MAX_HEIGHT = 27;
+  FONT_FAMILY = 28;
+  FONT_STYLE = 29;
+  FONT_VARIATIONS = 30;
+  OPACITY = 31;
+  FONT_SIZE = 32;
+  LETTER_SPACING = 34;
+  LINE_HEIGHT = 36;
+}
+
+enum VariableScope {
+  ALL_SCOPES = 0;
+  TEXT_CONTENT = 1;
+  CORNER_RADIUS = 2;
+  WIDTH_HEIGHT = 3;
+  GAP = 4;
+  ALL_FILLS = 5;
+  FRAME_FILL = 6;
+  SHAPE_FILL = 7;
+  TEXT_FILL = 8;
+  STROKE = 9;
+  STROKE_FLOAT = 10;
+  EFFECT_FLOAT = 11;
+  EFFECT_COLOR = 12;
+  OPACITY = 13;
+  FONT_STYLE = 14;
+  FONT_FAMILY = 15;
+  FONT_SIZE = 16;
+  LINE_HEIGHT = 17;
+  LETTER_SPACING = 18;
+  PARAGRAPH_SPACING = 19;
+  PARAGRAPH_INDENT = 20;
+  FONT_VARIATIONS = 21;
+}
+
+enum ExpressionFunction {
+  ADDITION = 0;
+  SUBTRACTION = 1;
+  RESOLVE_VARIANT = 2;
+  MULTIPLY = 3;
+  DIVIDE = 4;
+  EQUALS = 5;
+  NOT_EQUAL = 6;
+  LESS_THAN = 7;
+  LESS_THAN_OR_EQUAL = 8;
+  GREATER_THAN = 9;
+  GREATER_THAN_OR_EQUAL = 10;
+  AND = 11;
+  OR = 12;
+  NOT = 13;
+  STRINGIFY = 14;
+  TERNARY = 15;
+  VAR_MODE_LOOKUP = 16;
+  NEGATE = 17;
+  IS_TRUTHY = 18;
+}
+
+enum NodeFieldAliasType {
+  MISSING = 0;
+  COMPONENT_PROP_ASSIGNMENTS = 1;
+}
+
+enum CodeSyntaxPlatform {
+  WEB = 0;
+  ANDROID = 1;
+  iOS = 2;
+}
+
+enum TransformModifierType {
+  REPEAT = 0;
+  SYMMETRY = 1;
+  SKEW = 2;
+}
+
+enum RepeatType {
+  RADIAL = 0;
+  LINEAR = 1;
+}
+
+enum UnitType {
+  PIXELS = 0;
+  RELATIVE = 1;
+}
+
+enum RepeatOrder {
+  FORWARD = 0;
+  REVERSE = 1;
+}
+
+enum AnnotationPropertyType {
+  FILL = 0;
+  STROKE = 1;
+  WIDTH = 2;
+  HEIGHT = 3;
+  MIN_WIDTH = 4;
+  MIN_HEIGHT = 5;
+  MAX_WIDTH = 6;
+  MAX_HEIGHT = 7;
+  STROKE_WIDTH = 8;
+  CORNER_RADIUS = 9;
+  EFFECT = 10;
+  TEXT_STYLE = 11;
+  TEXT_ALIGN_HORIZONTAL = 12;
+  FONT_FAMILY = 13;
+  FONT_SIZE = 14;
+  FONT_WEIGHT = 15;
+  LINE_HEIGHT = 16;
+  LETTER_SPACING = 17;
+  STACK_SPACING = 18;
+  STACK_PADDING = 19;
+  STACK_MODE = 20;
+  STACK_ALIGNMENT = 21;
+  OPACITY = 22;
+  COMPONENT = 23;
+  FONT_STYLE = 24;
+  GRID_ROW_GAP = 25;
+  GRID_COLUMN_GAP = 26;
+  GRID_ROW_COUNT = 27;
+  GRID_COLUMN_COUNT = 28;
+  GRID_ROW_ANCHOR_INDEX = 29;
+  GRID_COLUMN_ANCHOR_INDEX = 30;
+  GRID_ROW_SPAN = 31;
+  GRID_COLUMN_SPAN = 32;
+}
+
+enum AnnotationCategoryPreset {
+  NONE = 0;
+  ACCESSIBILITY = 1;
+  BEHAVIOR = 2;
+  CONTENT = 3;
+  DEVELOPMENT = 4;
+  INTERACTION = 5;
+}
+
+enum BlurOpType {
+  NORMAL = 0;
+  PROGRESSIVE = 1;
+}
+
+struct GUID {
+  uint sessionID;
+  uint localID;
+}
+
+struct Vector {
+  float x;
+  float y;
+}
+
+struct Matrix {
+  float m00;
+  float m01;
+  float m02;
+  float m10;
+  float m11;
+  float m12;
+}
+
+struct Matrix3f {
+  float m00;
+  float m01;
+  float m02;
+  float m10;
+  float m11;
+  float m12;
+  float m20;
+  float m21;
+  float m22;
+}
+
+struct Color {
+  float r;
+  float g;
+  float b;
+  float a;
+}
+
+struct Rect {
+  float x;
+  float y;
+  float w;
+  float h;
+}
+
+struct CommandNum {
+  uint round;
+  uint count;
+}

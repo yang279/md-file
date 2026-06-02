@@ -1,0 +1,14 @@
+{
+  "name": "pix-to-json",
+  "version": "1.0.0",
+  "description": "Convert .pix / hex .txt files to JSON using pixso.js",
+  "main": "pix2json.js",
+  "scripts": {
+    "hex": "node pix2json.js",
+    "diff": "node diff_nodes.js"
+  },
+  "dependencies": {
+    "fzstd": "^0.1.1",
+    "kiwi-schema": "file:../kiwi-master/js"
+  }
+}

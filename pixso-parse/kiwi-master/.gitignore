@@ -1,0 +1,5 @@
+node_modules/
+rust/target/
+js/*.js
+js/*.d.ts
+js/.npmignore

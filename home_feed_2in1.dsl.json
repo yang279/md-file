@@ -1,0 +1,265 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "source": "pixso",
+    "file_id": "file-home-2in1-001",
+    "file_name": "2in1 首页/信息流",
+    "created_at": "2026-06-02T09:00:00Z",
+    "updated_at": "2026-06-02T09:00:00Z"
+  },
+  "pages": [
+    {
+      "id": "0:1",
+      "name": "首页",
+      "layers": [
+        {
+          "id": "100:1",
+          "name": "首页 - 2in1",
+          "type": "frame",
+          "visible": true,
+          "opacity": 1,
+          "blend_mode": "normal",
+          "box": { "x": 0, "y": 0, "width": 1280, "height": 800 },
+          "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#F1F3F5FF" }],
+          "children": [
+            {
+              "id": "100:2",
+              "name": "状态栏",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 0, "width": 1280, "height": 44 },
+              "instance": {
+                "symbol_id": "1:8291",
+                "variant_key": "41d46c236c538be76ffc50a6462ec60ccc737cf6",
+                "component_set_key": "9330cc56931bc08f2dba6ae32099f733e7949604",
+                "component_set_resolved": true,
+                "variant_props": { "Color Mode": "Light" },
+                "overrides": []
+              }
+            },
+            {
+              "id": "100:3",
+              "name": "标题栏",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 44, "width": 1280, "height": 56 },
+              "instance": {
+                "symbol_id": "1129:9294",
+                "variant_key": "119d94c03083fdcd4adb72f97c8d2f6e4e474af1",
+                "component_set_key": "5af71fd9d1c948f053d45bc260e108d55adaeb8d",
+                "component_set_resolved": true,
+                "variant_props": { "大小": "L", "状态": "Normal" },
+                "overrides": [
+                  {
+                    "node_id": "1129:9295",
+                    "field": "text_content",
+                    "value": "发现"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "100:4",
+              "name": "搜索框",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 240, "y": 108, "width": 800, "height": 40 },
+              "instance": {
+                "symbol_id": "2804:11314",
+                "variant_key": "a57b62f245e1190da9a534ba781997a8442b2ce2",
+                "component_set_key": "cdb133158f18d3fc5c9fd3bd3e9535550b3996f7",
+                "component_set_resolved": true,
+                "variant_props": { "Search": "ON", "状态": "Normal" },
+                "overrides": []
+              }
+            },
+            {
+              "id": "100:5",
+              "name": "分类页签",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 40, "y": 156, "width": 1200, "height": 48 },
+              "instance": {
+                "symbol_id": "1:9708",
+                "variant_key": "6ddf76145ea6f3e95238db84ac29e7bb494d834c",
+                "component_set_key": "149f6558c4ca01c6a53c85ec501aa8a740e28ffc",
+                "component_set_resolved": true,
+                "variant_props": { "类型": "tab" },
+                "overrides": []
+              }
+            },
+            {
+              "id": "100:6",
+              "name": "内容区域",
+              "type": "frame",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 212, "width": 1280, "height": 532 },
+              "fills": [],
+              "children": [
+                {
+                  "id": "100:20",
+                  "name": "为你推荐",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 8, "width": 200, "height": 32 },
+                  "text_content": "为你推荐",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Bold",
+                    "font_size": 22,
+                    "color": "#1A1A1AFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "100:7",
+                  "name": "卡片 - 大图",
+                  "type": "instance",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 52, "width": 384, "height": 468 },
+                  "instance": {
+                    "symbol_id": "1:11527",
+                    "variant_key": "66399a22956b4f0ba8665bfa4620af380eebd6dd",
+                    "component_set_key": "fb78d4e7f46e7a87b3d4c65374b23443e7104d21",
+                    "component_set_resolved": true,
+                    "variant_props": { "尺寸": "Larger" },
+                    "overrides": []
+                  }
+                },
+                {
+                  "id": "100:8",
+                  "name": "卡片 - 中图",
+                  "type": "instance",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 448, "y": 52, "width": 384, "height": 468 },
+                  "instance": {
+                    "symbol_id": "1:11530",
+                    "variant_key": "0a7101176c26a1d3b1c63640a97fa360bc830201",
+                    "component_set_key": "fb78d4e7f46e7a87b3d4c65374b23443e7104d21",
+                    "component_set_resolved": true,
+                    "variant_props": { "尺寸": "Medium" },
+                    "overrides": []
+                  }
+                },
+                {
+                  "id": "100:9",
+                  "name": "右侧列",
+                  "type": "frame",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 856, "y": 52, "width": 384, "height": 468 },
+                  "fills": [],
+                  "auto_layout": {
+                    "direction": "vertical",
+                    "gap": 16,
+                    "counter_gap": 0,
+                    "padding": [0, 0, 0, 0],
+                    "align_items": "stretch",
+                    "justify_content": "min",
+                    "wrap": false
+                  },
+                  "children": [
+                    {
+                      "id": "100:10",
+                      "name": "小卡片 1",
+                      "type": "instance",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": { "x": 0, "y": 0, "width": 384, "height": 216 },
+                      "instance": {
+                        "symbol_id": "1:11533",
+                        "variant_key": "b92aa4159db7d325e847bb0c1696ef226569c68e",
+                        "component_set_key": "fb78d4e7f46e7a87b3d4c65374b23443e7104d21",
+                        "component_set_resolved": true,
+                        "variant_props": { "尺寸": "Mini" },
+                        "overrides": []
+                      }
+                    },
+                    {
+                      "id": "100:11",
+                      "name": "小卡片 2",
+                      "type": "instance",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": { "x": 0, "y": 232, "width": 384, "height": 180 },
+                      "instance": {
+                        "symbol_id": "1:11540",
+                        "variant_key": "9dcb8ec9387c88ab39ebcdfc206883860c93e484",
+                        "component_set_key": "fb78d4e7f46e7a87b3d4c65374b23443e7104d21",
+                        "component_set_resolved": true,
+                        "variant_props": { "尺寸": "Small" },
+                        "overrides": []
+                      }
+                    },
+                    {
+                      "id": "100:12",
+                      "name": "查看更多",
+                      "type": "instance",
+                      "visible": true,
+                      "opacity": 1,
+                      "blend_mode": "normal",
+                      "box": { "x": 112, "y": 428, "width": 160, "height": 40 },
+                      "instance": {
+                        "symbol_id": "320:12074",
+                        "variant_key": "1ada38141ab6c9e5b3768605b3ca63d807d0a1b6",
+                        "component_set_key": "e6402d5eb8bf30659dd6db7c51b0b9ec6b4a8557",
+                        "component_set_resolved": true,
+                        "variant_props": { "尺寸": "Medium", "类型": "Normal", "状态": "Enabled" },
+                        "overrides": [
+                          {
+                            "node_id": "320:12075",
+                            "field": "text_content",
+                            "value": "查看更多"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "100:13",
+              "name": "底部导航",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 744, "width": 1280, "height": 56 },
+              "instance": {
+                "symbol_id": "1:8618",
+                "variant_key": "b66a11337f74aa7ac8b10662cdd6031b8f17be0f",
+                "component_set_key": "4bc893c34009f134f790498df5b4ec2ab9ad50f4",
+                "component_set_resolved": true,
+                "variant_props": { "个数": "4", "land": "OFF" },
+                "overrides": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

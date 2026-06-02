@@ -1,0 +1,112 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "source": "pixso",
+    "file_id": "file-instance-test",
+    "file_name": "Instance 测试页面",
+    "created_at": "2026-06-02T00:00:00Z",
+    "updated_at": "2026-06-02T00:00:00Z"
+  },
+  "pages": [
+    {
+      "id": "9:1",
+      "name": "测试页面",
+      "layers": [
+        {
+          "id": "100:1",
+          "name": "标题栏",
+          "type": "frame",
+          "visible": true,
+          "opacity": 1,
+          "blend_mode": "normal",
+          "box": { "x": 0, "y": 0, "width": 375, "height": 56 },
+          "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+          "children": [
+            {
+              "id": "100:2",
+              "name": "背景色块",
+              "type": "rectangle",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 0, "width": 375, "height": 56 },
+              "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#F5F5F5FF" }],
+              "corner_radius": 0
+            },
+            {
+              "id": "100:3",
+              "name": ".Title 2Line=OFF",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 0, "width": 375, "height": 56 },
+              "instance": {
+                "symbol_id": "1:11626",
+                "variant_key": "981114ab788c124f5b34b06f902be85aac0562ee",
+                "component_set_key": "6d576a39f11590444e473a60675ddc42847b5a7d",
+                "component_set_resolved": true,
+                "variant_props": { "2 Line": "OFF" }
+              }
+            },
+            {
+              "id": "100:4",
+              "name": ".close btn",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 327, "y": 16, "width": 24, "height": 24 },
+              "instance": {
+                "symbol_id": "1:11823",
+                "variant_key": "35e66a1862dab56af99b09de8bc5ddaf9a3966c5",
+                "component_set_key": "35e66a1862dab56af99b09de8bc5ddaf9a3966c5",
+                "component_set_resolved": true,
+                "variant_props": {}
+              }
+            }
+          ]
+        },
+        {
+          "id": "100:5",
+          "name": "内容区",
+          "type": "frame",
+          "visible": true,
+          "opacity": 1,
+          "blend_mode": "normal",
+          "box": { "x": 0, "y": 56, "width": 375, "height": 756 },
+          "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#F0F0F0FF" }],
+          "children": [
+            {
+              "id": "100:6",
+              "name": ".Button Group 类型=normal,个数=1",
+              "type": "instance",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 16, "y": 16, "width": 343, "height": 40 },
+              "instance": {
+                "symbol_id": "1:11558",
+                "variant_key": "6eb1d8c841e4289f559d238d1d6a0b22e48acb18",
+                "component_set_key": "7c366910bf8bc5d84d5ca1a3425f2a2e00ccc3af",
+                "component_set_resolved": true,
+                "variant_props": { "类型": "normal", "个数": "1" }
+              }
+            },
+            {
+              "id": "100:7",
+              "name": "分割线",
+              "type": "rectangle",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 64, "width": 375, "height": 1 },
+              "fills": [{ "type": "solid", "visible": true, "opacity": 0.12, "color": "#000000FF" }],
+              "corner_radius": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

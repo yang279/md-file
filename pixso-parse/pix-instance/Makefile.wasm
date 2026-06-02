@@ -1,0 +1,59 @@
+EMCC = $(HOME)/emsdk/upstream/emscripten/emcc
+
+CFLAGS_ZSTD = -O2 -I../zstd-1.5.6/lib
+
+ZSTD_SRCS = \
+	../zstd-1.5.6/lib/common/debug.c \
+	../zstd-1.5.6/lib/common/entropy_common.c \
+	../zstd-1.5.6/lib/common/error_private.c \
+	../zstd-1.5.6/lib/common/fse_decompress.c \
+	../zstd-1.5.6/lib/common/pool.c \
+	../zstd-1.5.6/lib/common/threading.c \
+	../zstd-1.5.6/lib/common/xxhash.c \
+	../zstd-1.5.6/lib/common/zstd_common.c \
+	../zstd-1.5.6/lib/decompress/huf_decompress.c \
+	../zstd-1.5.6/lib/decompress/zstd_ddict.c \
+	../zstd-1.5.6/lib/decompress/zstd_decompress.c \
+	../zstd-1.5.6/lib/decompress/zstd_decompress_block.c \
+	../zstd-1.5.6/lib/compress/fse_compress.c \
+	../zstd-1.5.6/lib/compress/hist.c \
+	../zstd-1.5.6/lib/compress/huf_compress.c \
+	../zstd-1.5.6/lib/compress/zstd_compress.c \
+	../zstd-1.5.6/lib/compress/zstd_compress_literals.c \
+	../zstd-1.5.6/lib/compress/zstd_compress_sequences.c \
+	../zstd-1.5.6/lib/compress/zstd_compress_superblock.c \
+	../zstd-1.5.6/lib/compress/zstd_double_fast.c \
+	../zstd-1.5.6/lib/compress/zstd_fast.c \
+	../zstd-1.5.6/lib/compress/zstd_lazy.c \
+	../zstd-1.5.6/lib/compress/zstd_ldm.c \
+	../zstd-1.5.6/lib/compress/zstd_opt.c
+
+TARGET = gen_instance
+
+ZSTD_OBJS = $(ZSTD_SRCS:.c=.wasm.o)
+
+all: $(TARGET).js
+
+# 单独编译 zstd C 文件（不加 -std=c++17）
+%.wasm.o: %.c
+	$(EMCC) -O2 -I../zstd-1.5.6/lib -c -o $@ $<
+
+# 链接：C++ 主文件 + zstd 对象文件
+$(TARGET).js: gen_instance_wasm.cpp $(ZSTD_OBJS)
+	$(EMCC) -std=c++17 -O2 \
+		-I.. -I../kiwi-master -I../zstd-1.5.6/lib \
+		--bind \
+		-s WASM=1 \
+		-s MODULARIZE=1 \
+		-s EXPORT_NAME="GenInstance" \
+		-s ALLOW_MEMORY_GROWTH=1 \
+		-s INITIAL_MEMORY=67108864 \
+		-s ENVIRONMENT='web,node' \
+		-o $(TARGET).js \
+		gen_instance_wasm.cpp $(ZSTD_OBJS)
+	@echo "✓ 生成: $(TARGET).js + $(TARGET).wasm"
+
+clean:
+	rm -f $(TARGET).js $(TARGET).wasm $(ZSTD_OBJS)
+
+.PHONY: all clean

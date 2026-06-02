@@ -1,0 +1,10 @@
+{
+  "task": "hex_preview",
+  "description": "读取多个组件集 hex 文件，打印前10字符并拼接输出",
+  "output": "output.txt",
+  "files": [
+    "../../pix-split/split_output/0_1.Dialog - 对话框.txt",
+    "../../pix-split/split_output/1_2.BindSheet - 浮层.txt",
+    "../../pix-split/split_output/2_3.Card view - 卡片视图.txt"
+  ]
+}

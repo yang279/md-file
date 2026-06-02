@@ -1,0 +1,767 @@
+@import {
+  def require(name string) dynamic
+  def it(name string, callback fn())
+  const __dirname string
+
+  namespace JSON {
+    def stringify(value dynamic) string
+  }
+}
+
+@entry
+def main {
+  var assert = require("assert")
+  var fs = require("fs")
+  var it = require("node:test")
+
+  it("struct bool", => {
+    var check = (i bool, o List<int>) => {
+      var message = test.BoolStruct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.BoolStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(false, [0])
+    check(true, [1])
+  })
+
+  it("struct byte", => {
+    var check = (i int, o List<int>) => {
+      var message = test.ByteStruct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.ByteStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0x00, [0x00])
+    check(0x01, [0x01])
+    check(0x7F, [0x7F])
+    check(0x80, [0x80])
+    check(0xFF, [0xFF])
+  })
+
+  it("struct uint", => {
+    var check = (i int, o List<int>) => {
+      var message = test.UintStruct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.UintStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0x00, [0x00])
+    check(0x01, [0x01])
+    check(0x02, [0x02])
+    check(0x7F, [0x7F])
+    check(0x80, [0x80, 0x01])
+    check(0x81, [0x81, 0x01])
+    check(0x100, [0x80, 0x02])
+    check(0x101, [0x81, 0x02])
+    check(0x17F, [0xFF, 0x02])
+    check(0x180, [0x80, 0x03])
+    check(0x1FF, [0xFF, 0x03])
+    check(0x200, [0x80, 0x04])
+    check(0x7FFF, [0xFF, 0xFF, 0x01])
+    check(0x8000, [0x80, 0x80, 0x02])
+    check(0x7FFFFFFF, [0xFF, 0xFF, 0xFF, 0xFF, 0x07])
+    check(0x80000000, [0x80, 0x80, 0x80, 0x80, 0x08])
+  })
+
+  it("struct int", =>  {
+    var check = (i int, o List<int>) => {
+      var message = test.IntStruct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.IntStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0x00, [0x00])
+    check(-0x01, [0x01])
+    check(0x01, [0x02])
+    check(-0x02, [0x03])
+    check(0x02, [0x04])
+    check(-0x3F, [0x7D])
+    check(0x3F, [0x7E])
+    check(-0x40, [0x7F])
+    check(0x40, [0x80, 0x01])
+    check(-0x3FFF, [0xFD, 0xFF, 0x01])
+    check(0x3FFF, [0xFE, 0xFF, 0x01])
+    check(-0x4000, [0xFF, 0xFF, 0x01])
+    check(0x4000, [0x80, 0x80, 0x02])
+    check(-0x3FFFFFFF, [0xFD, 0xFF, 0xFF, 0xFF, 0x07])
+    check(0x3FFFFFFF, [0xFE, 0xFF, 0xFF, 0xFF, 0x07])
+    check(-0x40000000, [0xFF, 0xFF, 0xFF, 0xFF, 0x07])
+    check(0x40000000, [0x80, 0x80, 0x80, 0x80, 0x08])
+    check(-0x7FFFFFFF, [0xFD, 0xFF, 0xFF, 0xFF, 0x0F])
+    check(0x7FFFFFFF, [0xFE, 0xFF, 0xFF, 0xFF, 0x0F])
+    check(-0x80000000, [0xFF, 0xFF, 0xFF, 0xFF, 0x0F])
+  })
+
+  it("struct float", => {
+    var check = (i double, o List<int>) => {
+      var message = test.FloatStruct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(JSON.stringify(test.FloatStruct.decode(Uint8Array.new(o))), JSON.stringify(message))
+    }
+
+    check(0, [0])
+    check(1, [127, 0, 0, 0])
+    check(-1, [127, 1, 0, 0])
+    check(3.1415927410125732, [128, 182, 31, 146])
+    check(-3.1415927410125732, [128, 183, 31, 146])
+    check(Math.INFINITY, [255, 0, 0, 0])
+    check(-Math.INFINITY, [255, 1, 0, 0])
+    check(Math.NAN, [255, 0, 0, 128])
+  })
+
+  it("struct string", => {
+    var check = (i string, o List<int>) => {
+      var message = test.StringStruct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.StringStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check("", [0])
+    check("abc", [97, 98, 99, 0])
+    check("🙉🙈🙊", [240, 159, 153, 137, 240, 159, 153, 136, 240, 159, 153, 138, 0])
+  })
+
+  it("struct int64", =>  {
+    var check = (i BigInt, o List<int>) => {
+      var message = test.Int64Struct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.Int64Struct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(BigInt.new(0x00), [0x00])
+    check(BigInt.new(-0x01), [0x01])
+    check(BigInt.new(0x01), [0x02])
+    check(BigInt.new(-0x02), [0x03])
+    check(BigInt.new(0x02), [0x04])
+    check(BigInt.new(-0x3F), [0x7D])
+    check(BigInt.new(0x3F), [0x7E])
+    check(BigInt.new(-0x40), [0x7F])
+    check(BigInt.new(0x40), [0x80, 0x01])
+    check(BigInt.new(-0x3FFF), [0xFD, 0xFF, 0x01])
+    check(BigInt.new(0x3FFF), [0xFE, 0xFF, 0x01])
+    check(BigInt.new(-0x4000), [0xFF, 0xFF, 0x01])
+    check(BigInt.new(0x4000), [0x80, 0x80, 0x02])
+    check(BigInt.new("0x44070C1420304040"), [0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88])
+    check(-BigInt.new("0x1000000000000001"), [0x81, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x20])
+    check(BigInt.new("0x1000000000000001"), [0x82, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x20])
+    check(-BigInt.new("0x3FFFFFFFFFFFFFFF"), [0xFD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F])
+    check(BigInt.new("0x3FFFFFFFFFFFFFFF"), [0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F])
+    check(-BigInt.new("0x4000000000000000"), [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F])
+    check(BigInt.new("0x4000000000000000"), [0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80])
+    check(-BigInt.new("0x7FFFFFFFFFFFFFFF"), [0xFD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
+    check(BigInt.new("0x7FFFFFFFFFFFFFFF"), [0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
+    check(-BigInt.new("0x8000000000000000"), [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
+  })
+
+  it("struct uint64", => {
+    var check = (i BigInt, o List<int>) => {
+      var message = test.Uint64Struct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.Uint64Struct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(BigInt.new(0x00), [0x00])
+    check(BigInt.new(0x01), [0x01])
+    check(BigInt.new(0x02), [0x02])
+    check(BigInt.new(0x7F), [0x7F])
+    check(BigInt.new(0x80), [0x80, 0x01])
+    check(BigInt.new(0x81), [0x81, 0x01])
+    check(BigInt.new(0x100), [0x80, 0x02])
+    check(BigInt.new(0x101), [0x81, 0x02])
+    check(BigInt.new(0x17F), [0xFF, 0x02])
+    check(BigInt.new(0x180), [0x80, 0x03])
+    check(BigInt.new(0x1FF), [0xFF, 0x03])
+    check(BigInt.new(0x200), [0x80, 0x04])
+    check(BigInt.new(0x7FFF), [0xFF, 0xFF, 0x01])
+    check(BigInt.new(0x8000), [0x80, 0x80, 0x02])
+    check(BigInt.new("0x7FFFFFFF"), [0xFF, 0xFF, 0xFF, 0xFF, 0x07])
+    check(BigInt.new("0x80000000"), [0x80, 0x80, 0x80, 0x80, 0x08])
+    check(BigInt.new("0x880E182840608080"), [0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88])
+    check(BigInt.new("0x1000000000000001"), [0x81, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x10])
+    check(BigInt.new("0x7FFFFFFFFFFFFFFF"), [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F])
+    check(BigInt.new("0x8000000000000000"), [0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80])
+    check(BigInt.new("0xFFFFFFFFFFFFFFFF"), [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
+  })
+
+  it("struct compound", => {
+    var check = (x int, y int, o List<int>) => {
+      var message = test.CompoundStruct.new
+      message.x = x
+      message.y = y
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.CompoundStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, 0, [0, 0])
+    check(1, 2, [1, 2])
+    check(12345, 54321, [185, 96, 177, 168, 3])
+  })
+
+  it("struct nested", => {
+    var check = (a int, bx int, by int, c int, o List<int>) => {
+      var b = test.CompoundStruct.new
+      b.x = bx
+      b.y = by
+      var message = test.NestedStruct.new
+      message.a = a
+      message.b = b
+      message.c = c
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.NestedStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, 0, 0, 0, [0, 0, 0, 0])
+    check(1, 2, 3, 4, [1, 2, 3, 4])
+    check(534, 12345, 54321, 321, [150, 4, 185, 96, 177, 168, 3, 193, 2])
+  })
+
+  it("message bool", => {
+    if true {
+      var o = [0]
+      var message = test.BoolMessage.new
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.BoolMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    var check = (i bool, o List<int>) => {
+      var message = test.BoolMessage.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.BoolMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(false, [1, 0, 0])
+    check(true, [1, 1, 0])
+  })
+
+  it("message byte", => {
+    var check = (i int, o List<int>) => {
+      var message = test.ByteMessage.new
+      if i != 0 { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.ByteMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, [0])
+    check(234, [1, 234, 0])
+  })
+
+  it("message uint", => {
+    var check = (i int, o List<int>) => {
+      var message = test.UintMessage.new
+      if i != 0 { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.UintMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, [0])
+    check(12345678, [1, 206, 194, 241, 5, 0])
+  })
+
+  it("message int", => {
+    var check = (i int, o List<int>) => {
+      var message = test.IntMessage.new
+      if i != 0 { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.IntMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, [0])
+    check(12345678, [1, 156, 133, 227, 11, 0])
+  })
+
+  it("message float", => {
+    var check = (i double, o List<int>) => {
+      var message = test.FloatMessage.new
+      if i != 0 { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.FloatMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, [0])
+    check(3.1415927410125732, [1, 128, 182, 31, 146, 0])
+  })
+
+  it("message string", => {
+    var check = (i string, o List<int>) => {
+      var message = test.StringMessage.new
+      if i != null { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.StringMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(null, [0])
+    check("", [1, 0, 0])
+    check("🙉🙈🙊", [1, 240, 159, 153, 137, 240, 159, 153, 136, 240, 159, 153, 138, 0, 0])
+  })
+
+  it("message int64", => {
+    var check = (i BigInt, o List<int>) => {
+      var message = test.Int64Message.new
+      if i != BigInt.new(0) { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.Int64Message.decode(Uint8Array.new(o)), message)
+    }
+
+    check(BigInt.new(0), [0])
+    check(BigInt.new("123456789012345678"), [0x01, 0x9C, 0xCD, 0x87, 0xE3, 0xF4, 0xD2, 0xCD, 0xB6, 0x03, 0x00])
+    check(BigInt.new("-123456789012345678"), [0x01, 0x9B, 0xCD, 0x87, 0xE3, 0xF4, 0xD2, 0xCD, 0xB6, 0x03, 0x00])
+  })
+
+  it("message uint64", => {
+    var check = (i BigInt, o List<int>) => {
+      var message = test.Uint64Message.new
+      if i != BigInt.new(0) { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.Uint64Message.decode(Uint8Array.new(o)), message)
+    }
+
+    check(BigInt.new(0), [0])
+    check(BigInt.new("123456789012345678"), [0x01, 0xCE, 0xE6, 0xC3, 0xB1, 0xBA, 0xE9, 0xA6, 0xDB, 0x01, 0x00])
+  })
+
+  it("message compound", => {
+    var check = (x int, y int, o List<int>) => {
+      var message = test.CompoundMessage.new
+      if x != 0 { message.x = x }
+      if y != 0 { message.y = y }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.CompoundMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, 0, [0])
+    check(123, 0, [1, 123, 0])
+    check(0, 234, [2, 234, 1, 0])
+    check(123, 234, [1, 123, 2, 234, 1, 0])
+  })
+
+  it("message nested", => {
+    var check = (a int, bx int, by int, c int, o List<int>) => {
+      var b = test.CompoundMessage.new
+      if bx != 0 { b.x = bx }
+      if by != 0 { b.y = by }
+      var message = test.NestedMessage.new
+      if a != 0 { message.a = a }
+      if bx != 0 || by != 0 { message.b = b }
+      if c != 0 { message.c = c }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.NestedMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(0, 0, 0, 0, [0])
+    check(123, 0, 0, 234, [1, 123, 3, 234, 1, 0])
+    check(0, 5, 6, 0, [2, 1, 5, 2, 6, 0, 0])
+    check(0, 5, 0, 123, [2, 1, 5, 0, 3, 123, 0])
+    check(234, 5, 6, 123, [1, 234, 1, 2, 1, 5, 2, 6, 0, 3, 123, 0])
+  })
+
+  it("struct bool array", => {
+    var check = (i List<bool>, o List<int>) => {
+      var message = test.BoolArrayStruct.new
+      message.x = i
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.BoolArrayStruct.decode(Uint8Array.new(o)), message)
+    }
+
+    check([], [0])
+    check([true, false], [2, 1, 0])
+  })
+
+  it("message bool array", => {
+    var check = (i List<bool>, o List<int>) => {
+      var message = test.BoolArrayMessage.new
+      if i != null { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.BoolArrayMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    check(null, [0])
+    check([], [1, 0, 0])
+    check([true, false], [1, 2, 1, 0, 0])
+  })
+
+  it("recursive message", => {
+    var check = (i test.RecursiveMessage, o List<int>) => {
+      var message = test.RecursiveMessage.new
+      if i != null { message.x = i }
+      assert.deepEqual(Uint8Array.new(message.encode), Uint8Array.new(o))
+      assert.deepEqual(test.RecursiveMessage.decode(Uint8Array.new(o)), message)
+    }
+
+    var nested = test.RecursiveMessage.new
+    nested.x = test.RecursiveMessage.new
+
+    check(null, [0])
+    check(test.RecursiveMessage.new, [1, 0, 0])
+    check(nested, [1, 1, 0, 0, 0])
+  })
+
+  it("binary schema", => {
+    var test_schema = test1.BinarySchema.new
+    test_schema.parse(Uint8Array.new(fs.readFileSync(__dirname + "/test-schema.bkiwi")))
+
+    var test1_schema1 = test1.BinarySchema.new
+    var test1_schema2 = test1.BinarySchema.new
+    var test2_schema1 = test2.BinarySchema.new
+    var test2_schema2 = test2.BinarySchema.new
+    test1_schema1.parse(Uint8Array.new(fs.readFileSync(__dirname + "/test1-schema.bkiwi")))
+    test1_schema2.parse(Uint8Array.new(fs.readFileSync(__dirname + "/test2-schema.bkiwi")))
+    test2_schema1.parse(Uint8Array.new(fs.readFileSync(__dirname + "/test1-schema.bkiwi")))
+    test2_schema2.parse(Uint8Array.new(fs.readFileSync(__dirname + "/test2-schema.bkiwi")))
+
+    var bytes1 = Uint8Array.new([1, 2, 2, 128, 0, 0, 0, 128, 0, 0, 128, 0])
+    assert.deepEqual(Uint8Array.new(test1.Message.decode(bytes1).encode), bytes1)
+    assert.deepEqual(Uint8Array.new(test1.Message.decode(bytes1, test1_schema1).encode), bytes1)
+    assert.deepEqual(Uint8Array.new(test1.Message.decode(bytes1, test1_schema2).encode), bytes1)
+    assert.deepEqual(Uint8Array.new(test2.Message.decode(bytes1).encode), bytes1)
+    assert.deepEqual(Uint8Array.new(test2.Message.decode(bytes1, test2_schema1).encode), bytes1)
+    assert.deepEqual(Uint8Array.new(test2.Message.decode(bytes1, test2_schema2).encode), bytes1)
+
+    var bytes2 = Uint8Array.new([1, 2, 2, 128, 0, 0, 0, 128, 0, 0, 128, 3, 1, 0, 4, 0, 5, 1, 240, 159, 141, 149, 0, 0, 0])
+    assert.throws(=> test1.Message.decode(bytes2))
+    assert.throws(=> test1.Message.decode(bytes2, test1_schema1))
+    assert.deepEqual(Uint8Array.new(test1.Message.decode(bytes2, test1_schema2).encode), bytes1)
+    assert.deepEqual(Uint8Array.new(test2.Message.decode(bytes2).encode), bytes2)
+    assert.deepEqual(Uint8Array.new(test2.Message.decode(bytes2, test2_schema1).encode), bytes2)
+    assert.deepEqual(Uint8Array.new(test2.Message.decode(bytes2, test2_schema2).encode), bytes2)
+  })
+
+  it("struct with many fields", => {
+    var s = test_large.Struct.new
+
+    s.f0 = 0
+    s.f1 = 1
+    s.f2 = 2
+    s.f3 = 3
+    s.f4 = 4
+    s.f5 = 5
+    s.f6 = 6
+    s.f7 = 7
+    s.f8 = 8
+    s.f9 = 9
+
+    s.f10 = 10
+    s.f11 = 11
+    s.f12 = 12
+    s.f13 = 13
+    s.f14 = 14
+    s.f15 = 15
+    s.f16 = 16
+    s.f17 = 17
+    s.f18 = 18
+    s.f19 = 19
+
+    s.f20 = 20
+    s.f21 = 21
+    s.f22 = 22
+    s.f23 = 23
+    s.f24 = 24
+    s.f25 = 25
+    s.f26 = 26
+    s.f27 = 27
+    s.f28 = 28
+    s.f29 = 29
+
+    s.f30 = 30
+    s.f31 = 31
+    s.f32 = 32
+    s.f33 = 33
+    s.f34 = 34
+    s.f35 = 35
+    s.f36 = 36
+    s.f37 = 37
+    s.f38 = 38
+    s.f39 = 39
+
+    s.f40 = 40
+    s.f41 = 41
+    s.f42 = 42
+    s.f43 = 43
+    s.f44 = 44
+    s.f45 = 45
+    s.f46 = 46
+    s.f47 = 47
+    s.f48 = 48
+    s.f49 = 49
+
+    s.f50 = 50
+    s.f51 = 51
+    s.f52 = 52
+    s.f53 = 53
+    s.f54 = 54
+    s.f55 = 55
+    s.f56 = 56
+    s.f57 = 57
+    s.f58 = 58
+    s.f59 = 59
+
+    s.f60 = 60
+    s.f61 = 61
+    s.f62 = 62
+    s.f63 = 63
+    s.f64 = 64
+    s.f65 = 65
+    s.f66 = 66
+    s.f67 = 67
+    s.f68 = 68
+    s.f69 = 69
+
+    s.f70 = 70
+    s.f71 = 71
+    s.f72 = 72
+    s.f73 = 73
+    s.f74 = 74
+    s.f75 = 75
+    s.f76 = 76
+    s.f77 = 77
+    s.f78 = 78
+    s.f79 = 79
+
+    s.f80 = 80
+    s.f81 = 81
+    s.f82 = 82
+    s.f83 = 83
+    s.f84 = 84
+    s.f85 = 85
+    s.f86 = 86
+    s.f87 = 87
+    s.f88 = 88
+    s.f89 = 89
+
+    s.f90 = 90
+    s.f91 = 91
+    s.f92 = 92
+    s.f93 = 93
+    s.f94 = 94
+    s.f95 = 95
+    s.f96 = 96
+    s.f97 = 97
+    s.f98 = 98
+    s.f99 = 99
+
+    s.f100 = 100
+    s.f101 = 101
+    s.f102 = 102
+    s.f103 = 103
+    s.f104 = 104
+    s.f105 = 105
+    s.f106 = 106
+    s.f107 = 107
+    s.f108 = 108
+    s.f109 = 109
+
+    s.f110 = 110
+    s.f111 = 111
+    s.f112 = 112
+    s.f113 = 113
+    s.f114 = 114
+    s.f115 = 115
+    s.f116 = 116
+    s.f117 = 117
+    s.f118 = 118
+    s.f119 = 119
+
+    s.f120 = 120
+    s.f121 = 121
+    s.f122 = 122
+    s.f123 = 123
+    s.f124 = 124
+    s.f125 = 125
+    s.f126 = 126
+    s.f127 = 127
+    s.f128 = 128
+    s.f129 = 129
+
+    var encoded = s.encode
+    assert.deepEqual(s, test_large.Struct.decode(encoded))
+  })
+
+  it("message with many fields", => {
+    var m = test_large.Message.new
+
+    m.f0 = 0
+    m.f1 = 1
+    m.f2 = 2
+    m.f3 = 3
+    m.f4 = 4
+    m.f5 = 5
+    m.f6 = 6
+    m.f7 = 7
+    m.f8 = 8
+    m.f9 = 9
+
+    m.f10 = 10
+    m.f11 = 11
+    m.f12 = 12
+    m.f13 = 13
+    m.f14 = 14
+    m.f15 = 15
+    m.f16 = 16
+    m.f17 = 17
+    m.f18 = 18
+    m.f19 = 19
+
+    m.f20 = 20
+    m.f21 = 21
+    m.f22 = 22
+    m.f23 = 23
+    m.f24 = 24
+    m.f25 = 25
+    m.f26 = 26
+    m.f27 = 27
+    m.f28 = 28
+    m.f29 = 29
+
+    m.f30 = 30
+    m.f31 = 31
+    m.f32 = 32
+    m.f33 = 33
+    m.f34 = 34
+    m.f35 = 35
+    m.f36 = 36
+    m.f37 = 37
+    m.f38 = 38
+    m.f39 = 39
+
+    m.f40 = 40
+    m.f41 = 41
+    m.f42 = 42
+    m.f43 = 43
+    m.f44 = 44
+    m.f45 = 45
+    m.f46 = 46
+    m.f47 = 47
+    m.f48 = 48
+    m.f49 = 49
+
+    m.f50 = 50
+    m.f51 = 51
+    m.f52 = 52
+    m.f53 = 53
+    m.f54 = 54
+    m.f55 = 55
+    m.f56 = 56
+    m.f57 = 57
+    m.f58 = 58
+    m.f59 = 59
+
+    m.f60 = 60
+    m.f61 = 61
+    m.f62 = 62
+    m.f63 = 63
+    m.f64 = 64
+    m.f65 = 65
+    m.f66 = 66
+    m.f67 = 67
+    m.f68 = 68
+    m.f69 = 69
+
+    m.f70 = 70
+    m.f71 = 71
+    m.f72 = 72
+    m.f73 = 73
+    m.f74 = 74
+    m.f75 = 75
+    m.f76 = 76
+    m.f77 = 77
+    m.f78 = 78
+    m.f79 = 79
+
+    m.f80 = 80
+    m.f81 = 81
+    m.f82 = 82
+    m.f83 = 83
+    m.f84 = 84
+    m.f85 = 85
+    m.f86 = 86
+    m.f87 = 87
+    m.f88 = 88
+    m.f89 = 89
+
+    m.f90 = 90
+    m.f91 = 91
+    m.f92 = 92
+    m.f93 = 93
+    m.f94 = 94
+    m.f95 = 95
+    m.f96 = 96
+    m.f97 = 97
+    m.f98 = 98
+    m.f99 = 99
+
+    m.f100 = 100
+    m.f101 = 101
+    m.f102 = 102
+    m.f103 = 103
+    m.f104 = 104
+    m.f105 = 105
+    m.f106 = 106
+    m.f107 = 107
+    m.f108 = 108
+    m.f109 = 109
+
+    m.f110 = 110
+    m.f111 = 111
+    m.f112 = 112
+    m.f113 = 113
+    m.f114 = 114
+    m.f115 = 115
+    m.f116 = 116
+    m.f117 = 117
+    m.f118 = 118
+    m.f119 = 119
+
+    m.f120 = 120
+    m.f121 = 121
+    m.f122 = 122
+    m.f123 = 123
+    m.f124 = 124
+    m.f125 = 125
+    m.f126 = 126
+    m.f127 = 127
+    m.f128 = 128
+    m.f129 = 129
+
+    var encoded = m.encode
+    assert.deepEqual(m, test_large.Message.decode(encoded))
+  })
+
+  it("message with deprecated fields", => {
+    var nonDeprecated = test.NonDeprecatedMessage.new
+    nonDeprecated.a = 1
+    nonDeprecated.b = 2
+    nonDeprecated.c = [3, 4, 5]
+    nonDeprecated.d = [6, 7, 8]
+    nonDeprecated.e = test.ByteStruct.new
+    nonDeprecated.e.x = 123
+    nonDeprecated.f = test.ByteStruct.new
+    nonDeprecated.f.x = 234
+    nonDeprecated.g = 9
+
+    var nonDeprecated2 = test.NonDeprecatedMessage.new
+    nonDeprecated2.a = 1
+    nonDeprecated2.c = [3, 4, 5]
+    nonDeprecated2.e = test.ByteStruct.new
+    nonDeprecated2.e.x = 123
+    nonDeprecated2.g = 9
+
+    var deprecated = test.DeprecatedMessage.new
+    deprecated.a = 1
+    deprecated.c = [3, 4, 5]
+    deprecated.e = test.ByteStruct.new
+    deprecated.e.x = 123
+    deprecated.g = 9
+
+    assert.deepEqual(test.DeprecatedMessage.decode(nonDeprecated.encode), deprecated)
+    assert.deepEqual(test.NonDeprecatedMessage.decode(deprecated.encode), nonDeprecated2)
+  })
+}
