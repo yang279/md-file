@@ -44,8 +44,8 @@ all: bin $(BIN)
 bin:
 	mkdir -p bin
 
-$(BIN): dsl_to_hex.cpp $(ZSTD_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+$(BIN): dsl_to_hex.cpp dsl_core.h $(ZSTD_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ dsl_to_hex.cpp $(ZSTD_OBJS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

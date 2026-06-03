@@ -8,8 +8,9 @@
 
 ```
 pix-dsl/
-├── dsl_to_hex.cpp          # CLI 工具源码
-├── dsl_to_hex_wasm.cpp     # WASM 版本源码（Node.js）
+├── dsl_core.h              # 共享核心逻辑（两个入口共用）
+├── dsl_to_hex.cpp          # CLI 入口（writeFile / isDirectory / verifyPix / main）
+├── dsl_to_hex_wasm.cpp     # WASM 入口（dslToHex / EMSCRIPTEN_BINDINGS）
 ├── Makefile                # CLI 编译
 ├── Makefile.wasm           # WASM 编译（需要 emsdk）
 ├── index.js                # WASM 调用示例（入口）
@@ -25,6 +26,8 @@ pix-dsl/
     ├── one_instance_out.txt    # 测试输出：单实例的 hex 结果
     └── instance_out.txt        # 测试输出：多实例的 hex 结果
 ```
+
+> **架构说明**：所有转换逻辑集中在 `dsl_core.h`，CLI 和 WASM 两个入口文件仅保留各自专用的部分。修改核心逻辑只需改 `dsl_core.h`，两个编译目标自动同步。
 
 ---
 
@@ -128,14 +131,20 @@ DSL JSON
   ↓ 解析图层树
   ↓ 按 component_set_key 加载组件 hex
 PixsoMsg 构建
-  ├── CANVAS {0,1}         可见页（每个 DSL page 一个）
+  ├── CANVAS {0,1}/{0,3}/{0,4}...  可见页（每个 DSL page 一个，跳过 {0,2}）
   │    └── 图层节点（FRAME/RECT/TEXT/INSTANCE...）
-  ├── CANVAS {0,2}         隐藏页（"Internal Only Canvas"）
-  │    └── 组件集全量节点（SYMBOL、FRAME 等，已本地 blob）
-  └── blobs[]              合并去重后的几何数据
+  ├── CANVAS {0,2}                  隐藏页（"Internal Only Canvas"，internalOnly=true）
+  │    └── 组件集全量节点（SYMBOL、FRAME 等）
+  └── blobs[]                       各组件集 blob 顺序拼接，按偏移量重映射下标
 ```
 
+**组件集节点写入规则**：
+- 全局 GUID 去重（`writtenGuids`），防止多组件集内嵌的共享子组件重复写入
+- 组件集内的 CANVAS 节点一律跳过，不写入输出
+- parent 不在本组件集内的根节点（孤根）自动改挂到隐藏页 `{0,2}`
+
 **INSTANCE 节点特殊处理**：
-- `size` 优先使用 SYMBOL 自身尺寸，忽略 DSL box 的 width/height
-- `derivedSymbolData` 按 SYMBOL 子树结构预分配空槽位（无覆写）
+- `visible / opacity / blendMode` 从 DSL 读取并写入
+- `size` 优先使用 SYMBOL 自身尺寸，DSL box 仅兜底
+- `derivedSymbolData` 每个槽位填入完整 `guidPath`（从 SYMBOL 根到后代节点的 GUID 链），Pixso 靠此定位嵌套实例
 - `symbolData.symbolID` 直接赋值 DSL 的 `symbol_id` GUID

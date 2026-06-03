@@ -118,3 +118,39 @@ C. dsl_to_hex 修复（阶段B）：合并 blob + 重映射 blobIndex
 ```
 
 A 优先，因为 B/C 依赖 A 产出的自包含组件 hex。B 和 C 可同步实现，在同一次节点拷贝循环里完成"改 parentIndex + 改 blobIndex"。
+
+---
+
+## 阶段 A 实际实现说明（已完成）
+
+`split_compset.cpp` 已实现阶段 A（`encodeNodes` 函数），包含 blob 收集、去重、重映射、写入的完整逻辑。
+
+### 已修复的关键 Bug：`remapBlobsInNode` 跨组件污染 li.pool
+
+**现象**：9330 等组件 hex 中 blob 内容与原始库不符（text glyph 和矢量路径数据错误），导致粘贴后渲染异常。
+
+**根本原因**：
+- `arr[OFFSET+i] = *it->second.raw` 是**浅拷贝**：节点的 `fillGeometry`、`textData.glyphs`、`vectorData` 等数组指针仍指向 `li.pool` 中的原始数据。
+- `remapBlobsInNode` 通过这些指针就地修改 `li.pool` 里的 blobIndex 值。
+- 第一个引用某节点的组件 remap 完毕后，`li.pool` 中的 blobIndex 已被替换为本地新值（如 1956 → 107）。
+- 后续组件（如 9330）处理同一节点时，读到的是已被替换的错误值，导致 usedIdx 收集错误、blob 数据拷贝错误。
+
+**修复方案（已提交）**：
+在 `remapBlobsInNode` 执行前，用 `collectBlobPtrs` 收集所有 blobIndex 字段的原始指针+原值；
+remap + encode 完毕后，用保存的原值逐一恢复 `li.pool` 中的 blobIndex，确保每次组件处理结束后 `li.pool` 状态不变。
+
+```cpp
+// 保存所有 blobIndex 原值
+std::vector<std::pair<int32_t *, int32_t>> savedBlobs;
+for (size_t i = 0; i < guids.size(); i++) {
+    std::vector<int32_t *> ptrs;
+    collectBlobPtrs(arr[OFFSET + i], ptrs);
+    for (int32_t *p : ptrs) savedBlobs.emplace_back(p, *p);
+}
+// remap
+for (size_t i = 0; i < guids.size(); i++) remapBlobsInNode(arr[OFFSET + i], remap);
+// encode
+out.encode(bb);
+// 恢复原值，防止跨组件污染
+for (auto &[ptr, val] : savedBlobs) *ptr = val;
+```

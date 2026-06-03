@@ -366,7 +366,37 @@ static void collectBlobsFromNode(const PixsoNode &n, std::set<int32_t> &out) {
     }
 }
 
-// 用重映射表修改一个 PixsoNode 里所有 blobIndex（修改的是浅拷贝后的 li.pool 内存，one-shot 可接受）
+// 收集一个 PixsoNode 中所有 blobIndex 字段的指针（包含递归子结构）
+// 用于 remap 前保存原值、remap 后恢复，避免污染 li.pool
+static void collectBlobPtrs(PixsoNode &n, std::vector<int32_t *> &ptrs) {
+    auto addPaths = [&](kiwi::Array<Path> *arr) {
+        if (!arr) return;
+        for (uint32_t i = 0; i < arr->size(); i++)
+            if ((*arr)[i].blobIndex()) ptrs.push_back((*arr)[i].blobIndex());
+    };
+    addPaths(n.fillGeometry());
+    addPaths(n.strokeGeometry());
+    addPaths(n.strokePaddingPath());
+    if (n.vectorData() && n.vectorData()->vectorNetworkBlob())
+        ptrs.push_back(n.vectorData()->vectorNetworkBlob());
+    if (n.textData() && n.textData()->glyphs()) {
+        auto *g = n.textData()->glyphs();
+        for (uint32_t i = 0; i < g->size(); i++)
+            if ((*g)[i].blobIndex()) ptrs.push_back((*g)[i].blobIndex());
+    }
+    if (n.symbolData() && n.symbolData()->symbolOverrides()) {
+        auto *ov = n.symbolData()->symbolOverrides();
+        for (uint32_t i = 0; i < ov->size(); i++) collectBlobPtrs((*ov)[i], ptrs);
+    }
+    if (n.derivedSymbolData()) {
+        auto *ds = n.derivedSymbolData();
+        for (uint32_t i = 0; i < ds->size(); i++) collectBlobPtrs((*ds)[i], ptrs);
+    }
+}
+
+// 用重映射表修改一个 PixsoNode 里所有 blobIndex
+// 注意：修改的是 li.pool 中的数据（浅拷贝节点的指针指向原始 pool）
+// 调用方须在 encode 完成后通过 savedBlobs 恢复原值，避免跨组件污染
 static void remapBlobsInNode(PixsoNode &n, const std::map<int32_t, int32_t> &remap) {
     if (remap.empty()) return;
     auto fixPaths = [&](kiwi::Array<Path> *arr) {
@@ -502,8 +532,27 @@ static std::vector<uint8_t> encodeNodes(const std::vector<GK> &guids,
             }
 
             // 5. 重映射节点中的 blobIndex
+            // remapBlobsInNode 会就地修改 li.pool 里的数据（因为 arr 是浅拷贝）。
+            // 在 remap 前收集所有 blobIndex 指针+原值，encode 完毕后恢复，
+            // 避免污染 li.pool 造成后续组件 blob 收集错误。
+            std::vector<std::pair<int32_t *, int32_t>> savedBlobs;
+            for (size_t i = 0; i < guids.size(); i++) {
+                std::vector<int32_t *> ptrs;
+                collectBlobPtrs(arr[OFFSET + i], ptrs);
+                for (int32_t *p : ptrs) savedBlobs.emplace_back(p, *p);
+            }
+
             for (size_t i = 0; i < guids.size(); i++)
                 remapBlobsInNode(arr[OFFSET + i], remap);
+
+            kiwi::ByteBuffer bb;
+            bool ok = out.encode(bb);
+
+            // 恢复 li.pool 中的原始 blobIndex，防止跨组件污染
+            for (auto &[ptr, val] : savedBlobs) *ptr = val;
+
+            if (!ok) return {};
+            return std::vector<uint8_t>(bb.data(), bb.data() + bb.size());
         }
     }
 
