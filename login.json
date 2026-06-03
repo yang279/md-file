@@ -1,0 +1,2433 @@
+{
+  "type": "FIC_DOCUMENT",
+  "pixsoNodes": [
+    {
+      "guid": {
+        "sessionID": 0,
+        "localID": 1
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 0,
+          "localID": 0
+        },
+        "position": "!"
+      },
+      "phase": "CREATED",
+      "type": "CANVAS",
+      "name": "登录页"
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 1
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 0,
+          "localID": 1
+        },
+        "position": "a00000000"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "type": "FRAME",
+      "name": "登录页面",
+      "visible": true,
+      "size": {
+        "x": 1440,
+        "y": 900
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 245,
+            "g": 247,
+            "b": 250,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 2
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 1
+        },
+        "position": "a00000000"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "type": "RECTANGLE",
+      "name": "页面背景",
+      "visible": true,
+      "size": {
+        "x": 1440,
+        "y": 900
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 245,
+            "g": 247,
+            "b": 250,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 3
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 1
+        },
+        "position": "a00000001"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 480,
+        "m10": 0,
+        "m11": 1,
+        "m12": 100
+      },
+      "type": "FRAME",
+      "name": "登录卡片",
+      "visible": true,
+      "size": {
+        "x": 480,
+        "y": 700
+      },
+      "blendMode": "NORMAL",
+      "cornerRadius": 16,
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 4
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000000"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 210,
+        "m10": 0,
+        "m11": 1,
+        "m12": 40
+      },
+      "type": "RECTANGLE",
+      "name": "Logo背景",
+      "visible": true,
+      "size": {
+        "x": 60,
+        "y": 60
+      },
+      "blendMode": "NORMAL",
+      "cornerRadius": 14,
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 37,
+            "g": 99,
+            "b": 235,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 5
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000001"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 210,
+        "m10": 0,
+        "m11": 1,
+        "m12": 40
+      },
+      "type": "TEXT",
+      "name": "Logo",
+      "visible": true,
+      "size": {
+        "x": 60,
+        "y": 60
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Bold",
+        "postscript": ""
+      },
+      "fontSize": 28,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "D",
+        "characterStyleIDs": [
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 28,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Bold",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 255,
+                  "g": 255,
+                  "b": 255,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      },
+      "pluginData": [
+        {
+          "pluginID": "pluginID",
+          "value": "{\"is_placeholder\":true,\"replacement_type\":\"image\",\"note\":\"应用 Logo，建议替换为图片或矢量 Logo\"}",
+          "key": "placeholder"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 6
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000002"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 116
+      },
+      "type": "TEXT",
+      "name": "应用名称",
+      "visible": true,
+      "size": {
+        "x": 480,
+        "y": 24
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 107,
+            "g": 114,
+            "b": 128,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 15,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "示例应用",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 15,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 107,
+                  "g": 114,
+                  "b": 128,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 7
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000003"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 156
+      },
+      "type": "TEXT",
+      "name": "欢迎标题",
+      "visible": true,
+      "size": {
+        "x": 480,
+        "y": 40
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 17,
+            "g": 24,
+            "b": 39,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Bold",
+        "postscript": ""
+      },
+      "fontSize": 28,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "欢迎登录",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 28,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Bold",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 17,
+                  "g": 24,
+                  "b": 39,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 8
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000004"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 204
+      },
+      "type": "TEXT",
+      "name": "副标题",
+      "visible": true,
+      "size": {
+        "x": 480,
+        "y": 20
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 107,
+            "g": 114,
+            "b": 128,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 14,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "请输入您的账号信息",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 14,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 107,
+                  "g": 114,
+                  "b": 128,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 9
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000005"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 244
+      },
+      "type": "TEXT",
+      "name": "用户名标签",
+      "visible": true,
+      "size": {
+        "x": 400,
+        "y": 18
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 55,
+            "g": 65,
+            "b": 81,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Medium",
+        "postscript": ""
+      },
+      "fontSize": 14,
+      "textAlignHorizontal": "LEFT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "用户名",
+        "characterStyleIDs": [
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 14,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Medium",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 55,
+                  "g": 65,
+                  "b": 81,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 10
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000006"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 270
+      },
+      "type": "RECTANGLE",
+      "name": "用户名输入框",
+      "visible": true,
+      "size": {
+        "x": 400,
+        "y": 44
+      },
+      "blendMode": "NORMAL",
+      "cornerRadius": 8,
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 11
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000007"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 56,
+        "m10": 0,
+        "m11": 1,
+        "m12": 282
+      },
+      "type": "TEXT",
+      "name": "用户名占位符",
+      "visible": true,
+      "size": {
+        "x": 280,
+        "y": 20
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 156,
+            "g": 163,
+            "b": 175,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 14,
+      "textAlignHorizontal": "LEFT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "请输入用户名",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 14,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 156,
+                  "g": 163,
+                  "b": 175,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 12
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000008"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 334
+      },
+      "type": "TEXT",
+      "name": "密码标签",
+      "visible": true,
+      "size": {
+        "x": 400,
+        "y": 18
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 55,
+            "g": 65,
+            "b": 81,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Medium",
+        "postscript": ""
+      },
+      "fontSize": 14,
+      "textAlignHorizontal": "LEFT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "密码",
+        "characterStyleIDs": [
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 14,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Medium",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 55,
+                  "g": 65,
+                  "b": 81,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 13
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000009"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 360
+      },
+      "type": "RECTANGLE",
+      "name": "密码输入框",
+      "visible": true,
+      "size": {
+        "x": 400,
+        "y": 44
+      },
+      "blendMode": "NORMAL",
+      "cornerRadius": 8,
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 14
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000000a"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 404,
+        "m10": 0,
+        "m11": 1,
+        "m12": 372
+      },
+      "type": "ELLIPSE",
+      "name": "眼睛图标",
+      "visible": true,
+      "size": {
+        "x": 20,
+        "y": 20
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 156,
+            "g": 163,
+            "b": 175,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "pluginData": [
+        {
+          "pluginID": "pluginID",
+          "value": "{\"is_placeholder\":true,\"replacement_type\":\"instance\",\"note\":\"密码输入框的眼睛图标，用于切换密码可见性\"}",
+          "key": "placeholder"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 15
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000000b"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 56,
+        "m10": 0,
+        "m11": 1,
+        "m12": 372
+      },
+      "type": "TEXT",
+      "name": "密码占位符",
+      "visible": true,
+      "size": {
+        "x": 260,
+        "y": 20
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 156,
+            "g": 163,
+            "b": 175,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 14,
+      "textAlignHorizontal": "LEFT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "请输入密码",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 14,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 156,
+                  "g": 163,
+                  "b": 175,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 16
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000000c"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 422
+      },
+      "type": "RECTANGLE",
+      "name": "记住我复选框",
+      "visible": true,
+      "size": {
+        "x": 16,
+        "y": 16
+      },
+      "blendMode": "NORMAL",
+      "cornerRadius": 4,
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 17
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000000d"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 64,
+        "m10": 0,
+        "m11": 1,
+        "m12": 422
+      },
+      "type": "TEXT",
+      "name": "记住我文字",
+      "visible": true,
+      "size": {
+        "x": 56,
+        "y": 16
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 55,
+            "g": 65,
+            "b": 81,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 13,
+      "textAlignHorizontal": "LEFT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "记住我",
+        "characterStyleIDs": [
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 13,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 55,
+                  "g": 65,
+                  "b": 81,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 18
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000000e"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 324,
+        "m10": 0,
+        "m11": 1,
+        "m12": 422
+      },
+      "type": "TEXT",
+      "name": "忘记密码链接",
+      "visible": true,
+      "size": {
+        "x": 116,
+        "y": 16
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 37,
+            "g": 99,
+            "b": 235,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 13,
+      "textAlignHorizontal": "RIGHT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "忘记密码?",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 13,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 37,
+                  "g": 99,
+                  "b": 235,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 19
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000000f"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 462
+      },
+      "type": "RECTANGLE",
+      "name": "登录按钮背景",
+      "visible": true,
+      "size": {
+        "x": 400,
+        "y": 44
+      },
+      "blendMode": "NORMAL",
+      "cornerRadius": 8,
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 37,
+            "g": 99,
+            "b": 235,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 20
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000010"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 462
+      },
+      "type": "TEXT",
+      "name": "登录按钮文字",
+      "visible": true,
+      "size": {
+        "x": 400,
+        "y": 44
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Bold",
+        "postscript": ""
+      },
+      "fontSize": 15,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "登录",
+        "characterStyleIDs": [
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 15,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Bold",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 255,
+                  "g": 255,
+                  "b": 255,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 21
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000011"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 40,
+        "m10": 0,
+        "m11": 1,
+        "m12": 541
+      },
+      "type": "RECTANGLE",
+      "name": "分割线左",
+      "visible": true,
+      "size": {
+        "x": 165,
+        "y": 1
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 229,
+            "g": 231,
+            "b": 235,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 22
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000012"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 213,
+        "m10": 0,
+        "m11": 1,
+        "m12": 530
+      },
+      "type": "TEXT",
+      "name": "分割线文字",
+      "visible": true,
+      "size": {
+        "x": 54,
+        "y": 22
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 156,
+            "g": 163,
+            "b": 175,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 13,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "或",
+        "characterStyleIDs": [
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 13,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 156,
+                  "g": 163,
+                  "b": 175,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 23
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000013"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 275,
+        "m10": 0,
+        "m11": 1,
+        "m12": 541
+      },
+      "type": "RECTANGLE",
+      "name": "分割线右",
+      "visible": true,
+      "size": {
+        "x": 165,
+        "y": 1
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 229,
+            "g": 231,
+            "b": 235,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 24
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000014"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 136,
+        "m10": 0,
+        "m11": 1,
+        "m12": 568
+      },
+      "type": "ELLIPSE",
+      "name": "微信圆形",
+      "visible": true,
+      "size": {
+        "x": 48,
+        "y": 48
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 25
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000015"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 136,
+        "m10": 0,
+        "m11": 1,
+        "m12": 568
+      },
+      "type": "TEXT",
+      "name": "微信图标",
+      "visible": true,
+      "size": {
+        "x": 48,
+        "y": 48
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 7,
+            "g": 193,
+            "b": 96,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Bold",
+        "postscript": ""
+      },
+      "fontSize": 16,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "微",
+        "characterStyleIDs": [
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 16,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Bold",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 7,
+                  "g": 193,
+                  "b": 96,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      },
+      "pluginData": [
+        {
+          "pluginID": "pluginID",
+          "value": "{\"is_placeholder\":true,\"replacement_type\":\"instance\",\"note\":\"微信登录图标\"}",
+          "key": "placeholder"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 26
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000016"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 124,
+        "m10": 0,
+        "m11": 1,
+        "m12": 624
+      },
+      "type": "TEXT",
+      "name": "微信标签",
+      "visible": true,
+      "size": {
+        "x": 72,
+        "y": 14
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 107,
+            "g": 114,
+            "b": 128,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 12,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "微信",
+        "characterStyleIDs": [
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 12,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 107,
+                  "g": 114,
+                  "b": 128,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 27
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000017"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 216,
+        "m10": 0,
+        "m11": 1,
+        "m12": 568
+      },
+      "type": "ELLIPSE",
+      "name": "手机号圆形",
+      "visible": true,
+      "size": {
+        "x": 48,
+        "y": 48
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 28
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000018"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 216,
+        "m10": 0,
+        "m11": 1,
+        "m12": 568
+      },
+      "type": "TEXT",
+      "name": "手机号图标",
+      "visible": true,
+      "size": {
+        "x": 48,
+        "y": 48
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 37,
+            "g": 99,
+            "b": 235,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Bold",
+        "postscript": ""
+      },
+      "fontSize": 16,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "手",
+        "characterStyleIDs": [
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 16,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Bold",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 37,
+                  "g": 99,
+                  "b": 235,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      },
+      "pluginData": [
+        {
+          "pluginID": "pluginID",
+          "value": "{\"is_placeholder\":true,\"replacement_type\":\"instance\",\"note\":\"手机号登录图标\"}",
+          "key": "placeholder"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 29
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a00000019"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 204,
+        "m10": 0,
+        "m11": 1,
+        "m12": 624
+      },
+      "type": "TEXT",
+      "name": "手机号标签",
+      "visible": true,
+      "size": {
+        "x": 72,
+        "y": 14
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 107,
+            "g": 114,
+            "b": 128,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 12,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "手机号",
+        "characterStyleIDs": [
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 12,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 107,
+                  "g": 114,
+                  "b": 128,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 30
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000001a"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 296,
+        "m10": 0,
+        "m11": 1,
+        "m12": 568
+      },
+      "type": "ELLIPSE",
+      "name": "QQ圆形",
+      "visible": true,
+      "size": {
+        "x": 48,
+        "y": 48
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 31
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000001b"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 296,
+        "m10": 0,
+        "m11": 1,
+        "m12": 568
+      },
+      "type": "TEXT",
+      "name": "QQ图标",
+      "visible": true,
+      "size": {
+        "x": 48,
+        "y": 48
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 29,
+            "g": 98,
+            "b": 240,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Bold",
+        "postscript": ""
+      },
+      "fontSize": 16,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "Q",
+        "characterStyleIDs": [
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 16,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Bold",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 29,
+                  "g": 98,
+                  "b": 240,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      },
+      "pluginData": [
+        {
+          "pluginID": "pluginID",
+          "value": "{\"is_placeholder\":true,\"replacement_type\":\"instance\",\"note\":\"QQ登录图标\"}",
+          "key": "placeholder"
+        }
+      ]
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 32
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000001c"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 284,
+        "m10": 0,
+        "m11": 1,
+        "m12": 624
+      },
+      "type": "TEXT",
+      "name": "QQ标签",
+      "visible": true,
+      "size": {
+        "x": 72,
+        "y": 14
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 107,
+            "g": 114,
+            "b": 128,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 12,
+      "textAlignHorizontal": "CENTER",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "QQ",
+        "characterStyleIDs": [
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 12,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 107,
+                  "g": 114,
+                  "b": 128,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 33
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000001d"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 156,
+        "m10": 0,
+        "m11": 1,
+        "m12": 654
+      },
+      "type": "TEXT",
+      "name": "注册引导文字",
+      "visible": true,
+      "size": {
+        "x": 80,
+        "y": 18
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 55,
+            "g": 65,
+            "b": 81,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 14,
+      "textAlignHorizontal": "LEFT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "没有账号？",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 14,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 55,
+                  "g": 65,
+                  "b": 81,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 1,
+        "localID": 34
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 1,
+          "localID": 3
+        },
+        "position": "a0000001e"
+      },
+      "phase": "CREATED",
+      "transform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 244,
+        "m10": 0,
+        "m11": 1,
+        "m12": 654
+      },
+      "type": "TEXT",
+      "name": "立即注册链接",
+      "visible": true,
+      "size": {
+        "x": 80,
+        "y": 18
+      },
+      "blendMode": "NORMAL",
+      "opacity": 1,
+      "fillPaints": [
+        {
+          "type": "SOLID",
+          "color": {
+            "r": 37,
+            "g": 99,
+            "b": 235,
+            "a": 255
+          },
+          "opacity": 1,
+          "visible": true,
+          "blendMode": "NORMAL"
+        }
+      ],
+      "fontName": {
+        "family": "HarmonyOS Sans",
+        "style": "Regular",
+        "postscript": ""
+      },
+      "fontSize": 14,
+      "textAlignHorizontal": "LEFT",
+      "textAlignVertical": "CENTER",
+      "textData": {
+        "characters": "立即注册",
+        "characterStyleIDs": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "styleOverrideTable": [
+          {
+            "styleID": 0,
+            "fontSize": 14,
+            "fontName": {
+              "family": "HarmonyOS Sans",
+              "style": "Regular",
+              "postscript": ""
+            },
+            "fillPaints": [
+              {
+                "type": "SOLID",
+                "color": {
+                  "r": 37,
+                  "g": 99,
+                  "b": 235,
+                  "a": 255
+                },
+                "opacity": 1,
+                "visible": true,
+                "blendMode": "NORMAL"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "guid": {
+        "sessionID": 0,
+        "localID": 2
+      },
+      "parentIndex": {
+        "guid": {
+          "sessionID": 0,
+          "localID": 0
+        },
+        "position": "~"
+      },
+      "phase": "CREATED",
+      "type": "CANVAS",
+      "name": "Internal Only Canvas",
+      "internalOnly": true
+    }
+  ]
+}

@@ -1,0 +1,610 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "source": "pixso",
+    "file_id": "login-page-001",
+    "file_name": "登录页面设计稿",
+    "created_at": "2026-06-03T00:00:00Z",
+    "updated_at": "2026-06-03T12:00:00Z"
+  },
+  "pages": [
+    {
+      "id": "0:1",
+      "name": "登录页",
+      "layers": [
+        {
+          "id": "1:1",
+          "name": "登录页面",
+          "type": "frame",
+          "visible": true,
+          "opacity": 1,
+          "blend_mode": "normal",
+          "box": { "x": 0, "y": 0, "width": 1440, "height": 900 },
+          "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#F5F7FAFF" }],
+          "children": [
+            {
+              "id": "1:2",
+              "name": "页面背景",
+              "type": "rectangle",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 0, "y": 0, "width": 1440, "height": 900 },
+              "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#F5F7FAFF" }]
+            },
+            {
+              "id": "1:3",
+              "name": "登录卡片",
+              "type": "frame",
+              "visible": true,
+              "opacity": 1,
+              "blend_mode": "normal",
+              "box": { "x": 480, "y": 100, "width": 480, "height": 700 },
+              "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+              "corner_radius": 16,
+              "effects": [
+                {
+                  "type": "drop_shadow",
+                  "visible": true,
+                  "color": "#0000001A",
+                  "offset_x": 0,
+                  "offset_y": 4,
+                  "blur": 24,
+                  "spread": 0
+                }
+              ],
+              "children": [
+                {
+                  "id": "1:4",
+                  "name": "Logo背景",
+                  "type": "rectangle",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 210, "y": 40, "width": 60, "height": 60 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#2563EBFF" }],
+                  "corner_radius": 14
+                },
+                {
+                  "id": "1:5",
+                  "name": "Logo",
+                  "type": "text",
+                  "placeholder": {
+                    "is_placeholder": true,
+                    "replacement_type": "image",
+                    "note": "应用 Logo，建议替换为图片或矢量 Logo"
+                  },
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 210, "y": 40, "width": 60, "height": 60 },
+                  "text_content": "D",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Bold",
+                    "font_size": 28,
+                    "color": "#FFFFFFFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:6",
+                  "name": "应用名称",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 0, "y": 116, "width": 480, "height": 24 },
+                  "text_content": "示例应用",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 15,
+                    "color": "#6B7280FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:7",
+                  "name": "欢迎标题",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 0, "y": 156, "width": 480, "height": 40 },
+                  "text_content": "欢迎登录",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Bold",
+                    "font_size": 28,
+                    "color": "#111827FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:8",
+                  "name": "副标题",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 0, "y": 204, "width": 480, "height": 20 },
+                  "text_content": "请输入您的账号信息",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#6B7280FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:9",
+                  "name": "用户名标签",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 244, "width": 400, "height": 18 },
+                  "text_content": "用户名",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Medium",
+                    "font_size": 14,
+                    "color": "#374151FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:10",
+                  "name": "用户名输入框",
+                  "type": "rectangle",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 270, "width": 400, "height": 44 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+                  "strokes": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#D1D5DBFF", "width": 1 }],
+                  "corner_radius": 8
+                },
+                {
+                  "id": "1:11",
+                  "name": "用户名占位符",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 56, "y": 282, "width": 280, "height": 20 },
+                  "text_content": "请输入用户名",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#9CA3AFFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:12",
+                  "name": "密码标签",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 334, "width": 400, "height": 18 },
+                  "text_content": "密码",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Medium",
+                    "font_size": 14,
+                    "color": "#374151FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:13",
+                  "name": "密码输入框",
+                  "type": "rectangle",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 360, "width": 400, "height": 44 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+                  "strokes": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#D1D5DBFF", "width": 1 }],
+                  "corner_radius": 8
+                },
+                {
+                  "id": "1:14",
+                  "name": "眼睛图标",
+                  "type": "ellipse",
+                  "placeholder": {
+                    "is_placeholder": true,
+                    "replacement_type": "instance",
+                    "note": "密码输入框的眼睛图标，用于切换密码可见性"
+                  },
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 404, "y": 372, "width": 20, "height": 20 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#9CA3AFFF" }]
+                },
+                {
+                  "id": "1:15",
+                  "name": "密码占位符",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 56, "y": 372, "width": 260, "height": 20 },
+                  "text_content": "请输入密码",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#9CA3AFFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:16",
+                  "name": "记住我复选框",
+                  "type": "rectangle",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 422, "width": 16, "height": 16 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+                  "strokes": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#D1D5DBFF", "width": 1 }],
+                  "corner_radius": 4
+                },
+                {
+                  "id": "1:17",
+                  "name": "记住我文字",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 64, "y": 422, "width": 56, "height": 16 },
+                  "text_content": "记住我",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 13,
+                    "color": "#374151FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:18",
+                  "name": "忘记密码链接",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 324, "y": 422, "width": 116, "height": 16 },
+                  "text_content": "忘记密码?",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 13,
+                    "color": "#2563EBFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "right",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:19",
+                  "name": "登录按钮背景",
+                  "type": "rectangle",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 462, "width": 400, "height": 44 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#2563EBFF" }],
+                  "corner_radius": 8
+                },
+                {
+                  "id": "1:20",
+                  "name": "登录按钮文字",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 462, "width": 400, "height": 44 },
+                  "text_content": "登录",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Bold",
+                    "font_size": 15,
+                    "color": "#FFFFFFFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:21",
+                  "name": "分割线左",
+                  "type": "rectangle",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 40, "y": 541, "width": 165, "height": 1 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#E5E7EBFF" }]
+                },
+                {
+                  "id": "1:22",
+                  "name": "分割线文字",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 213, "y": 530, "width": 54, "height": 22 },
+                  "text_content": "或",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 13,
+                    "color": "#9CA3AFFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:23",
+                  "name": "分割线右",
+                  "type": "rectangle",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 275, "y": 541, "width": 165, "height": 1 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#E5E7EBFF" }]
+                },
+                {
+                  "id": "1:24",
+                  "name": "微信圆形",
+                  "type": "ellipse",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 136, "y": 568, "width": 48, "height": 48 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+                  "strokes": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#E5E7EBFF", "width": 1 }]
+                },
+                {
+                  "id": "1:25",
+                  "name": "微信图标",
+                  "type": "text",
+                  "placeholder": {
+                    "is_placeholder": true,
+                    "replacement_type": "instance",
+                    "note": "微信登录图标"
+                  },
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 136, "y": 568, "width": 48, "height": 48 },
+                  "text_content": "微",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Bold",
+                    "font_size": 16,
+                    "color": "#07C160FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:26",
+                  "name": "微信标签",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 124, "y": 624, "width": 72, "height": 14 },
+                  "text_content": "微信",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 12,
+                    "color": "#6B7280FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:27",
+                  "name": "手机号圆形",
+                  "type": "ellipse",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 216, "y": 568, "width": 48, "height": 48 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+                  "strokes": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#E5E7EBFF", "width": 1 }]
+                },
+                {
+                  "id": "1:28",
+                  "name": "手机号图标",
+                  "type": "text",
+                  "placeholder": {
+                    "is_placeholder": true,
+                    "replacement_type": "instance",
+                    "note": "手机号登录图标"
+                  },
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 216, "y": 568, "width": 48, "height": 48 },
+                  "text_content": "手",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Bold",
+                    "font_size": 16,
+                    "color": "#2563EBFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:29",
+                  "name": "手机号标签",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 204, "y": 624, "width": 72, "height": 14 },
+                  "text_content": "手机号",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 12,
+                    "color": "#6B7280FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:30",
+                  "name": "QQ圆形",
+                  "type": "ellipse",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 296, "y": 568, "width": 48, "height": 48 },
+                  "fills": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#FFFFFFFF" }],
+                  "strokes": [{ "type": "solid", "visible": true, "opacity": 1, "color": "#E5E7EBFF", "width": 1 }]
+                },
+                {
+                  "id": "1:31",
+                  "name": "QQ图标",
+                  "type": "text",
+                  "placeholder": {
+                    "is_placeholder": true,
+                    "replacement_type": "instance",
+                    "note": "QQ登录图标"
+                  },
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 296, "y": 568, "width": 48, "height": 48 },
+                  "text_content": "Q",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Bold",
+                    "font_size": 16,
+                    "color": "#1D62F0FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:32",
+                  "name": "QQ标签",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 284, "y": 624, "width": 72, "height": 14 },
+                  "text_content": "QQ",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 12,
+                    "color": "#6B7280FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "center",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:33",
+                  "name": "注册引导文字",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 156, "y": 654, "width": 80, "height": 18 },
+                  "text_content": "没有账号？",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#374151FF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                },
+                {
+                  "id": "1:34",
+                  "name": "立即注册链接",
+                  "type": "text",
+                  "visible": true,
+                  "opacity": 1,
+                  "blend_mode": "normal",
+                  "box": { "x": 244, "y": 654, "width": 80, "height": 18 },
+                  "text_content": "立即注册",
+                  "text_style": {
+                    "font_family": "HarmonyOS Sans",
+                    "font_style": "Regular",
+                    "font_size": 14,
+                    "color": "#2563EBFF",
+                    "letter_spacing": 0,
+                    "line_height": "auto",
+                    "align_h": "left",
+                    "align_v": "center"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

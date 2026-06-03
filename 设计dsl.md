@@ -58,6 +58,7 @@
 | `opacity` | number | 是 | 透明度，范围 `0`~`1` |
 | `blend_mode` | string | 是 | 混合模式，见 [BlendMode](#blendmode) |
 | `box` | BoundingBox | 是 | 节点包围框，相对父节点坐标 |
+| `placeholder` | PlaceholderMeta | 否 | 占位符元信息（标记临时替代图层）|
 
 ### NormalLayer（普通图层）
 
@@ -262,5 +263,38 @@
       ]
     }
   ]
+}
+```
+
+---
+
+## PlaceholderMeta
+
+占位符标记数据，用于标记临时替代图层，提示未来需要替换为正式组件或资源。placeholder 数据会写入 Pixso 文件的 pluginData 字段，便于后续处理。
+
+| 字段 | 类型 | 必选 | 说明 |
+|---|---|---|---|
+| `is_placeholder` | boolean | 是 | 是否为占位符 |
+| `replacement_type` | string | 是 | 建议替换类型，当前支持：<br>• `"instance"` - 云端组件实例<br>• `"vector"` - 矢量路径<br>• `"image"` - 图片填充<br>未来可扩展其他类型 |
+| `note` | string | 否 | 人工备注说明（不限制长度）|
+
+**pluginData 写入规则**：
+- 当图层包含 `placeholder` 字段时，解析器会将其写入 PixsoNode 的 pluginData 数组
+- pluginID：`"pluginID"`
+- key：`"placeholder"`
+- value：JSON 字符串格式，包含上述三个字段
+
+**示例**：
+```json
+{
+  "id": "1:14",
+  "name": "眼睛图标",
+  "type": "ellipse",
+  "placeholder": {
+    "is_placeholder": true,
+    "replacement_type": "instance",
+    "note": "密码输入框的眼睛图标"
+  },
+  "box": { "x": 404, "y": 372, "width": 20, "height": 20 }
 }
 ```
