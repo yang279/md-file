@@ -1,0 +1,7 @@
+# 超大文件，禁止追踪
+md-skill.zip
+pixso-parse/HarmonyOS Component Library（来自社区）.json
+
+# macOS 系统文件
+.DS_Store
+**/.DS_Store
