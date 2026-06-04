@@ -1,0 +1,9 @@
+{
+  "name": "component-query",
+  "version": "1.0.0",
+  "description": "组件信息查询服务，根据名称/变体属性查询 componentKey 及变体数据",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

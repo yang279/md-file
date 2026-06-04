@@ -41,7 +41,7 @@ bin:
 	$(EMCC) -O2 -I../zstd-1.5.6/lib -c -o $@ $<
 
 # 链接主文件，输出到 bin/
-$(BIN_JS): dsl_to_hex_wasm.cpp $(ZSTD_OBJS)
+$(BIN_JS): dsl_to_hex_wasm.cpp dsl_core.h $(ZSTD_OBJS)
 	$(EMCC) -std=c++17 -O2 \
 		-I.. -I../kiwi-master -I../zstd-1.5.6/lib \
 		--bind \

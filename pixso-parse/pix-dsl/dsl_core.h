@@ -302,6 +302,14 @@ struct DslLayer {
     std::string textFontStyle  = "Regular";
     float       textFontSize   = 14.0f;
     std::string textColor      = "#0F172AFF";
+    std::string textAlignH        = "left";   // left / center / right / justified
+    std::string textAlignV        = "top";    // top / center / bottom
+    float       textLetterSpacing = 0.0f;    // px，0 表示默认
+    std::string textLineHeight    = "auto";  // "auto" 或 px 数字字符串
+    // PlaceholderMeta（公共字段，所有图层均可有）
+    bool        placeholderEnabled = false;
+    std::string placeholderType;   // instance / vector / image
+    std::string placeholderNote;
 };
 
 struct DslPage { std::string id, name; std::vector<DslLayer> layers; };
@@ -329,6 +337,13 @@ static DslLayer parseLayer(const JVal &j) {
     if (j.has("opacity"))       l.opacity      = j.get("opacity").asFloat();
     if (j.has("blend_mode"))    l.blendMode    = j.get("blend_mode").asStr();
     if (j.has("corner_radius")) l.cornerRadius = j.get("corner_radius").asFloat();
+    // PlaceholderMeta（公共字段）
+    if (j.has("placeholder")) {
+        const JVal &ph = j.get("placeholder");
+        l.placeholderEnabled = ph.get("is_placeholder").asBool();
+        if (ph.has("replacement_type")) l.placeholderType = ph.get("replacement_type").asStr();
+        if (ph.has("note"))             l.placeholderNote = ph.get("note").asStr();
+    }
 
     if (j.has("box")) {
         const JVal &b = j.get("box");
@@ -370,6 +385,14 @@ static DslLayer parseLayer(const JVal &j) {
         if (ts.has("font_style"))  l.textFontStyle  = ts.get("font_style").asStr();
         if (ts.has("font_size"))   l.textFontSize   = ts.get("font_size").asFloat();
         if (ts.has("color"))       l.textColor      = ts.get("color").asStr();
+        if (ts.has("align_h"))        l.textAlignH        = ts.get("align_h").asStr();
+        if (ts.has("align_v"))        l.textAlignV        = ts.get("align_v").asStr();
+        if (ts.has("letter_spacing")) l.textLetterSpacing = ts.get("letter_spacing").asFloat();
+        if (ts.has("line_height")) {
+            const JVal &lh = ts.get("line_height");
+            l.textLineHeight = (lh.type == JVal::Str) ? lh.asStr()
+                             : std::to_string(lh.asFloat());
+        }
     }
     return l;
 }
@@ -783,6 +806,24 @@ static void fillLayerNode(kiwi::MemoryPool &pool,
     if (layer.cornerRadius != 0.0f)
         n.set_cornerRadius(layer.cornerRadius);
 
+    // PlaceholderMeta → pluginData（所有图层类型均处理）
+    if (layer.placeholderEnabled) {
+        // 构造 value JSON：{"is_placeholder":true,"replacement_type":"...","note":"..."}
+        std::string val = "{\"is_placeholder\":true,\"replacement_type\":\"";
+        val += layer.placeholderType;
+        val += "\"";
+        if (!layer.placeholderNote.empty()) {
+            val += ",\"note\":\"";
+            val += layer.placeholderNote;
+            val += "\"";
+        }
+        val += "}";
+        auto &pd = n.set_pluginData(pool, 1);
+        pd[0].set_pluginID(pool.string("pix-dsl"));
+        pd[0].set_key(pool.string("placeholder_meta"));
+        pd[0].set_value(pool.string(val.c_str()));
+    }
+
     if (!layer.fills.empty()) {
         auto &paints = n.set_fillPaints(pool, (uint32_t)layer.fills.size());
         for (size_t i = 0; i < layer.fills.size(); i++) {
@@ -870,8 +911,52 @@ static void fillLayerNode(kiwi::MemoryPool &pool,
 
             n.set_textData(td);
         }
-        // TODO: text_style.align_h / align_v → TextAlignHorizontal / TextAlignVertical
-        // TODO: text_style.letter_spacing / line_height → TextStyleData
+        // align_h → TextAlignHorizontal
+        {
+            TextAlignHorizontal h = TextAlignHorizontal::LEFT;
+            if      (layer.textAlignH == "center")    h = TextAlignHorizontal::CENTER;
+            else if (layer.textAlignH == "right")     h = TextAlignHorizontal::RIGHT;
+            else if (layer.textAlignH == "justified") h = TextAlignHorizontal::JUSTIFIED;
+            n.set_textAlignHorizontal(h);
+        }
+        // align_v → TextAlignVertical
+        {
+            TextAlignVertical v = TextAlignVertical::TOP;
+            if      (layer.textAlignV == "center") v = TextAlignVertical::CENTER;
+            else if (layer.textAlignV == "bottom") v = TextAlignVertical::BOTTOM;
+            n.set_textAlignVertical(v);
+        }
+        // letter_spacing → PixsoNode + styleOverrideTable[0]（非 0 才写）
+        if (layer.textLetterSpacing != 0.0f) {
+            Number *ls = pool.allocate<Number>(); new(ls) Number();
+            ls->set_value(layer.textLetterSpacing);
+            ls->set_units(NumberUnits::PIXELS);
+            n.set_letterSpacing(ls);
+            // 同步写入 styleOverrideTable（若已创建）
+            auto *tbl = n.textData() ? n.textData()->styleOverrideTable() : nullptr;
+            if (tbl && tbl->size() > 0) {
+                Number *ls2 = pool.allocate<Number>(); new(ls2) Number();
+                ls2->set_value(layer.textLetterSpacing);
+                ls2->set_units(NumberUnits::PIXELS);
+                (*tbl)[0].set_letterSpacing(ls2);
+            }
+        }
+        // line_height → PixsoNode + styleOverrideTable[0]（非 auto 才写）
+        if (layer.textLineHeight != "auto" && !layer.textLineHeight.empty()) {
+            float lhVal = std::stof(layer.textLineHeight);
+            Number *lh = pool.allocate<Number>(); new(lh) Number();
+            lh->set_value(lhVal);
+            lh->set_units(NumberUnits::PIXELS);
+            n.set_lineHeight(lh);
+            // 同步写入 styleOverrideTable（若已创建）
+            auto *tbl = n.textData() ? n.textData()->styleOverrideTable() : nullptr;
+            if (tbl && tbl->size() > 0) {
+                Number *lh2 = pool.allocate<Number>(); new(lh2) Number();
+                lh2->set_value(lhVal);
+                lh2->set_units(NumberUnits::PIXELS);
+                (*tbl)[0].set_lineHeight(lh2);
+            }
+        }
     }
 
     for (size_t i = 0; i < layer.children.size(); i++)

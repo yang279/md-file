@@ -1,0 +1,9 @@
+{
+  "name": "dsl-to-hex",
+  "version": "1.0.0",
+  "description": "DSL转hex服务：接收设计DSL JSON，调用WASM生成Pixso可导入的hex文件",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
