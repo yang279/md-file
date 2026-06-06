@@ -284,6 +284,19 @@ struct DslOverride {
     std::string value;   // "查看更多"
 };
 
+struct DslAutoLayout {
+    bool        enabled       = false;
+    std::string direction     = "vertical"; // "horizontal" | "vertical"
+    float       gap           = 0.0f;
+    float       padTop        = 0.0f;
+    float       padRight      = 0.0f;
+    float       padBottom     = 0.0f;
+    float       padLeft       = 0.0f;
+    std::string alignItems    = "min";   // min / center / max / stretch
+    std::string justifyContent= "min";  // min / center / max / space_evenly
+    bool        wrap          = false;
+};
+
 struct DslLayer {
     std::string id, name, type;
     bool        visible      = true;
@@ -293,6 +306,7 @@ struct DslLayer {
     float       cornerRadius = 0.0f;
     std::vector<DslFill>  fills;
     std::vector<DslLayer> children;
+    DslAutoLayout autoLayout;
     // instance 字段
     std::string symbolId, variantKey, componentSetKey;
     std::vector<DslOverride> overrides;
@@ -337,6 +351,21 @@ static DslLayer parseLayer(const JVal &j) {
     if (j.has("opacity"))       l.opacity      = j.get("opacity").asFloat();
     if (j.has("blend_mode"))    l.blendMode    = j.get("blend_mode").asStr();
     if (j.has("corner_radius")) l.cornerRadius = j.get("corner_radius").asFloat();
+    if (j.has("auto_layout")) {
+        const JVal &al = j.get("auto_layout");
+        l.autoLayout.enabled = true;
+        if (al.has("direction"))        l.autoLayout.direction      = al.get("direction").asStr();
+        if (al.has("gap"))              l.autoLayout.gap            = al.get("gap").asFloat();
+        if (al.has("align_items"))      l.autoLayout.alignItems     = al.get("align_items").asStr();
+        if (al.has("justify_content"))  l.autoLayout.justifyContent = al.get("justify_content").asStr();
+        if (al.has("wrap"))             l.autoLayout.wrap           = al.get("wrap").asBool();
+        if (al.has("padding") && al.get("padding").size() == 4) {
+            l.autoLayout.padTop    = al.get("padding")[0].asFloat();
+            l.autoLayout.padRight  = al.get("padding")[1].asFloat();
+            l.autoLayout.padBottom = al.get("padding")[2].asFloat();
+            l.autoLayout.padLeft   = al.get("padding")[3].asFloat();
+        }
+    }
     // PlaceholderMeta（公共字段）
     if (j.has("placeholder")) {
         const JVal &ph = j.get("placeholder");
@@ -842,6 +871,34 @@ static void fillLayerNode(kiwi::MemoryPool &pool,
                 if (c) p.set_color(c);
             }
         }
+    }
+
+    if (layer.autoLayout.enabled) {
+        const DslAutoLayout &al = layer.autoLayout;
+        n.set_stackMode(al.direction == "horizontal" ? StackMode::HORIZONTAL : StackMode::VERTICAL);
+        if (al.gap != 0.0f) n.set_stackSpacing(al.gap);
+        n.set_stackPaddingTop(al.padTop);
+        n.set_stackPaddingRight(al.padRight);
+        n.set_stackPaddingBottom(al.padBottom);
+        n.set_stackPaddingLeft(al.padLeft);
+
+        // align_items → stackCounterAlign（垂直于主轴方向的对齐）
+        {
+            StackCounterAlign ca = StackCounterAlign::MIN;
+            if      (al.alignItems == "center")  ca = StackCounterAlign::CENTER;
+            else if (al.alignItems == "max")     ca = StackCounterAlign::MAX;
+            else if (al.alignItems == "stretch") ca = StackCounterAlign::STRETCH;
+            n.set_stackCounterAlign(ca);
+        }
+        // justify_content → stackJustify（主轴方向的分布）
+        {
+            StackJustify sj = StackJustify::MIN;
+            if      (al.justifyContent == "center")       sj = StackJustify::CENTER;
+            else if (al.justifyContent == "max")          sj = StackJustify::MAX;
+            else if (al.justifyContent == "space_evenly") sj = StackJustify::SPACE_EVENLY;
+            n.set_stackJustify(sj);
+        }
+        n.set_stackWrap(al.wrap ? WrapMode::WRAP : WrapMode::NO_WRAP);
     }
 
     if (layer.type == "text") {

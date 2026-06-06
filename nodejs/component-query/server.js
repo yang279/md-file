@@ -10,7 +10,7 @@ const ComponentSearcher = require('./searcher');
 // ---------------------------------------------------------------------------
 const PORT          = Number(process.env.PORT) || 3100;
 const COMPONENT_DIR = process.env.COMPONENT_DIR
-  || path.resolve(__dirname, '../../pixso-parse/pix-split/harmony_out/component');
+  || path.resolve(__dirname, '../../pixso-parse/pix-split/lib-out/ict-ui/component');
 const INDEX_PATH    = process.env.INDEX_PATH
   || path.join(COMPONENT_DIR, 'component_index.json');
 
@@ -49,8 +49,10 @@ function readBody(req) {
   });
 }
 
-// 仅允许 40 位小写 hex，防止路径穿越
-const KEY_RE = /^[a-f0-9]{40}$/;
+// 允许两种 key 格式，防止路径穿越：
+//   旧格式：40 位小写 hex（SHA1 componentKey）
+//   新格式：{sessionId}_{localId}（从 guid 派生）
+const KEY_RE = /^([a-f0-9]{40}|\d+_\d+)$/;
 
 // ---------------------------------------------------------------------------
 // 路由处理
@@ -80,7 +82,7 @@ async function handle(req, res) {
       return sendJSON(res, 400, { error: 'props must be an object' });
     }
 
-    const result = searcher.query({ name, props });
+    const result = await searcher.query({ name, props });
     return sendJSON(res, 200, result);
   }
 

@@ -4,6 +4,38 @@
 
 ---
 
+## 向量索引（可选，提升语义搜索精度）
+
+组件查询服务支持可选的向量语义搜索。未构建索引时自动降级为字符串匹配，功能不受影响。
+
+**构建步骤（首次使用或组件库更新后执行一次）：**
+
+```bash
+cd nodejs/component-query
+
+# 方案 A：Ollama（本地，免费）
+# 前提：已安装 Ollama 并拉取模型
+ollama pull nomic-embed-text
+node build-embeddings.js
+
+# 方案 B：OpenAI
+OPENAI_API_KEY=sk-xxx node build-embeddings.js
+```
+
+输出文件：`{COMPONENT_DIR}/embeddings.json`（约 20~80MB，取决于变体数量）
+
+**相关环境变量：**
+
+| 变量 | 默认值 | 说明 |
+|---|---|---|
+| `OLLAMA_URL` | `http://localhost:11434` | Ollama 服务地址 |
+| `OPENAI_API_KEY` | 未设置 | 设置后自动切换到 OpenAI API |
+| `EMBEDDING_MODEL` | `nomic-embed-text` / `text-embedding-3-small` | 嵌入模型名称 |
+
+> 脚本支持断点续传：中断后重新运行会跳过已完成的条目。
+
+---
+
 ## 服务一：组件查询服务（component-query）
 
 **默认端口：** `3100`
@@ -23,8 +55,11 @@ PORT=3100 COMPONENT_DIR=/path/to/harmony_out/component node server.js
 | 变量 | 默认值 | 说明 |
 |---|---|---|
 | `PORT` | `3100` | 监听端口 |
-| `COMPONENT_DIR` | `../../pixso-parse/pix-split/harmony_out/component` | 组件 hex 文件目录（含 `component_index.json`） |
+| `COMPONENT_DIR` | `../../pixso-parse/pix-split/lib-out/ict-ui/component` | 组件 hex 文件目录（含 `component_index.json`） |
 | `INDEX_PATH` | `{COMPONENT_DIR}/component_index.json` | 索引文件路径（通常不需要单独设置） |
+| `OLLAMA_URL` | `http://localhost:11434` | 查询时 embed 调用的 Ollama 地址（仅向量模式） |
+| `OPENAI_API_KEY` | 未设置 | 设置后查询时 embed 改用 OpenAI |
+| `EMBEDDING_MODEL` | 同构建脚本默认值 | 查询时使用的嵌入模型，需与构建时一致 |
 
 ---
 
@@ -36,10 +71,13 @@ PORT=3100 COMPONENT_DIR=/path/to/harmony_out/component node server.js
 ```json
 {
   "status": "ok",
-  "component_sets": 184,
-  "standalone_components": 142
+  "component_sets": 319,
+  "standalone_components": 172,
+  "embeddings_loaded": true
 }
 ```
+
+`embeddings_loaded: true` 表示向量索引已加载，查询将使用语义搜索；`false` 时降级为字符串匹配。
 
 ---
 
@@ -78,7 +116,7 @@ PORT=3100 COMPONENT_DIR=/path/to/harmony_out/component node server.js
 
 **`props` 匹配规则：**
 
-变体 name 格式为 `"类型=文本,状态=正常,尺寸=大"`，解析后与 props 逐字段比对，命中数即为 score。`matched_variants` 按 score 降序排列。
+变体 name 格式为 `"类型=文本,状态=正常"` 或 `"status=default, size=normal"`，解析后与 props 逐字段比对（大小写不敏感），命中数即为 score。`matched_variants` 按 score 降序排列。
 
 **响应 200（找到）：**
 
@@ -86,33 +124,20 @@ PORT=3100 COMPONENT_DIR=/path/to/harmony_out/component node server.js
 {
   "found": true,
   "component_set": {
-    "name": ".Button",
-    "component_set_key": "ecb8481025909ec9371c3b25104bb8b7c1079224",
-    "canvas_name": "1. Buttons 按钮类"
+    "name": "文字链接",
+    "component_set_key": "",
+    "hex_key": "8229_277383",
+    "canvas_name": "1.基础类"
   },
   "default_variant": {
-    "name": "类型=填充,状态=正常,尺寸=大",
-    "symbol_id": "1:100",
-    "variant_key": "549fdf93a10fec402c93432a2e228e407ccc2954",
-    "component_set_key": "ecb8481025909ec9371c3b25104bb8b7c1079224",
+    "name": "status=independent, Interaction=default, size=normal, disabled=false",
+    "symbol_id": "8229:277395",
+    "variant_key": "8229:277395",
+    "component_set_key": "",
+    "hex_key": "8229_277383",
     "score": 0
   },
-  "matched_variants": [
-    {
-      "name": "类型=文本,状态=正常,尺寸=大",
-      "symbol_id": "1:234",
-      "variant_key": "abc123...",
-      "component_set_key": "ecb8481025909ec9371c3b25104bb8b7c1079224",
-      "score": 2
-    },
-    {
-      "name": "类型=填充,状态=正常,尺寸=大",
-      "symbol_id": "1:100",
-      "variant_key": "549fdf93...",
-      "component_set_key": "ecb8481025909ec9371c3b25104bb8b7c1079224",
-      "score": 1
-    }
-  ]
+  "matched_variants": [ ... ]
 }
 ```
 
@@ -127,12 +152,14 @@ PORT=3100 COMPONENT_DIR=/path/to/harmony_out/component node server.js
 | 字段 | 说明 |
 |---|---|
 | `found` | 是否找到匹配的组件集 |
-| `component_set.component_set_key` | 组件集 key，用于设计DSL 的 `instance.component_set_key` |
-| `default_variant.symbol_id` | 变体 GUID（`sessionID:localID` 格式），用于设计DSL 的 `instance.symbol_id` |
-| `default_variant.variant_key` | 变体 componentKey，用于设计DSL 的 `instance.variant_key` |
-| `variant.score` | 与 props 的命中数；无 props 时均为 0 |
+| `component_set.hex_key` | hex 文件键名，用于 `GET /hex/:key` 获取组件内容 |
+| `component_set.component_set_key` | 旧版库为 40 位 SHA1；新版库为空字符串，改用 `hex_key` |
+| `default_variant.symbol_id` | 变体 GUID（`sessionId:localId`），写入设计DSL 的 `instance.symbol_id` |
+| `default_variant.variant_key` | 旧版为 SHA1，新版等于 `symbol_id` |
+| `default_variant.hex_key` | 继承自组件集，指向同一个 hex 文件 |
+| `variant.score` | props 命中数；无 props 时均为 0 |
 
-**standalone 组件（无变体）：** `variant_key == component_set_key`，`default_variant.name` 为组件名称本身。
+**standalone 组件（无变体）：** `variant_key == symbol_id`，`name` 为组件名称本身。
 
 **响应 400：**
 ```json
