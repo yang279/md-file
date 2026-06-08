@@ -81,7 +81,9 @@ PORT=3100 COMPONENT_DIR=/path/to/harmony_out/component node server.js
 
 ---
 
-### POST /query  
+### POST /query（当前已停用）
+
+> **注意：** 该接口当前在 [server.js](component-query/server.js) 中已被注释掉，请求会返回 `404 { "error": "not found" }`。服务暂时只提供 `/health` 与 `/hex/:key`。以下为接口启用时的行为说明，供恢复时参考。
 
 根据组件名称和变体属性查询变体数据。
 
@@ -172,7 +174,7 @@ PORT=3100 COMPONENT_DIR=/path/to/harmony_out/component node server.js
 
 返回指定 componentKey 对应的 hex 文件内容（供 dsl-to-hex 服务调用）。
 
-**路径参数：** `key` — 40 位小写 hex 字符串（SHA1 componentKey）
+**路径参数：** `key` — 40 位小写 hex 字符串（旧版 SHA1 componentKey），或 `{sessionId}_{localId}` 格式（新版，如 `8229_277383`）
 
 **响应 200：** `Content-Type: text/plain`，hex 文件原始内容
 
@@ -222,7 +224,7 @@ PORT=3101 COMPONENT_QUERY_URL=http://localhost:3100 node server.js
 
 ### POST /convert
 
-接收设计DSL JSON，输出 Pixso 可导入的 hex 字符串。
+接收设计DSL JSON，输出包含 hex 文件及 placeholder 资源文件的 zip 压缩包（base64 编码）。详见 [dsl-to-hex/API.md](dsl-to-hex/API.md)。
 
 **请求头：** `Content-Type: application/json`
 
@@ -245,7 +247,7 @@ PORT=3101 COMPONENT_QUERY_URL=http://localhost:3100 node server.js
 
 ```json
 {
-  "hex": "<!-- pixso binary data -->\n0a1b2c3d..."
+  "zip": "<base64 编码的 zip 包，解压后含 output.hex 及 svg/png 资源文件>"
 }
 ```
 
@@ -253,14 +255,14 @@ PORT=3101 COMPONENT_QUERY_URL=http://localhost:3100 node server.js
 
 ```json
 {
-  "hex": "<!-- pixso binary data -->\n0a1b2c3d...",
+  "zip": "<base64 编码的 zip 包>",
   "missing_keys": [
     "ecb8481025909ec9371c3b25104bb8b7c1079224"
   ]
 }
 ```
 
-`missing_keys` 存在时，hex 仍有效（WASM 跳过缺失组件继续生成），但对应 instance 节点将缺失。
+`missing_keys` 存在时，zip 仍有效（WASM 跳过缺失组件继续生成），但对应 instance 节点将缺失。
 
 **响应 500（转换失败）：**
 
@@ -272,13 +274,17 @@ PORT=3101 COMPONENT_QUERY_URL=http://localhost:3100 node server.js
 
 ```json
 { "error": "dsl (object) is required" }
+{ "error": "dsl.pages must be an array" }
+{ "error": "invalid JSON body" }
 ```
 
 ---
 
 ## 完整调用流程示例
 
-### 1. 查询 Button 文本变体
+> `/query` 当前已停用（见上文说明），下面流程 1 仅作为接口恢复后的参考；当前实际可用流程为 2、3。
+
+### 1. 查询 Button 文本变体（接口当前停用）
 
 ```bash
 curl -X POST http://localhost:3100/query \
@@ -291,17 +297,20 @@ curl -X POST http://localhost:3100/query \
 
 取响应中 `default_variant` 的 `symbol_id`、`variant_key`、`component_set_key`，填入设计DSL 的 `instance` 字段。
 
-### 2. 转换设计DSL为hex
+### 2. 转换设计DSL为zip
 
 ```bash
 curl -X POST http://localhost:3101/convert \
   -H "Content-Type: application/json" \
   -d '{
     "dsl": { "meta": { ... }, "pages": [ ... ] }
-  }'
+  }' \
+  | jq -r '.zip' | base64 -d > output.zip
+
+unzip output.zip   # 得到 output.hex 及各 placeholder 资源文件（svg/png）
 ```
 
-响应中的 `hex` 字段即为可导入 Pixso 的文件内容，写入 `.txt` 文件即可。
+`output.hex` 即为可导入 Pixso 的文件内容，写入 `.txt` 扩展名即可导入。详见 [dsl-to-hex/API.md](dsl-to-hex/API.md)。
 
 ### 3. 获取组件hex（通常由 dsl-to-hex 内部调用）
 

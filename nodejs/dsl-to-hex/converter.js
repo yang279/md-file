@@ -5,6 +5,7 @@ const os   = require('os');
 const path = require('path');
 const http  = require('http');
 const https = require('https');
+const { spawnSync } = require('child_process');
 
 // ---------------------------------------------------------------------------
 // WASM 单例（服务生命周期内只初始化一次）
@@ -48,6 +49,37 @@ function extractComponentKeys(dsl) {
     }
   }
   return [...keys];
+}
+
+// ---------------------------------------------------------------------------
+// 遍历 DSL 图层树，收集 svg/image 类型的 placeholder
+// ---------------------------------------------------------------------------
+function collectPlaceholders(layer, out) {
+  const p = layer.placeholder;
+  if (p && p.is_placeholder && p.note) {
+    const type = p.replacement_type;
+    if (type === 'svg' || type === 'image') {
+      out.push({ id: layer.id, type, note: p.note });
+    }
+  }
+  for (const child of layer.children || []) {
+    collectPlaceholders(child, out);
+  }
+}
+
+function extractPlaceholders(dsl) {
+  const list = [];
+  for (const page of dsl.pages || []) {
+    for (const layer of page.layers || []) {
+      collectPlaceholders(layer, list);
+    }
+  }
+  return list;
+}
+
+// id "1:14" → "1_14"（用于文件名）
+function idToGuid(id) {
+  return String(id).replace(/:/g, '_');
 }
 
 // ---------------------------------------------------------------------------
@@ -98,6 +130,27 @@ async function fetchAllHex(keys, queryBaseUrl) {
 }
 
 // ---------------------------------------------------------------------------
+// 将 hex 输出与 svg/png 资源打包成 zip，返回 Buffer
+// ---------------------------------------------------------------------------
+function buildZip(tmpDir, hexContent, placeholders) {
+  fs.writeFileSync(path.join(tmpDir, 'output.hex'), hexContent, 'utf8');
+
+  const files = ['output.hex'];
+  for (const { id, type } of placeholders) {
+    const guid = idToGuid(id);
+    const fname = type === 'svg' ? `${guid}.svg` : `${guid}.png`;
+    if (fs.existsSync(path.join(tmpDir, fname))) files.push(fname);
+  }
+
+  const zipPath = path.join(tmpDir, 'output.zip');
+  const r = spawnSync('zip', [zipPath, ...files], { cwd: tmpDir });
+  if (r.status !== 0) {
+    throw new Error(`zip 打包失败: ${r.stderr?.toString().trim()}`);
+  }
+  return fs.readFileSync(zipPath);
+}
+
+// ---------------------------------------------------------------------------
 // 解析 WASM dslToHex 的返回值
 // WASM 返回三种格式：
 //   1. '{"error":"..."}' — 转换失败
@@ -137,6 +190,19 @@ async function convert(dsl) {
       fs.writeFileSync(path.join(tmpDir, `${key}.txt`), content, 'utf8');
     }
 
+    // placeholder svg/image 文件：{tmpDir}/{guid}.svg 或 {guid}.png
+    const placeholders = extractPlaceholders(dsl);
+    for (const { id, type, note } of placeholders) {
+      const guid = idToGuid(id);
+      if (type === 'svg') {
+        fs.writeFileSync(path.join(tmpDir, `${guid}.svg`), note, 'utf8');
+      } else {
+        // base64 → binary
+        const b64 = note.replace(/^data:image\/[^;]+;base64,/, '');
+        fs.writeFileSync(path.join(tmpDir, `${guid}.png`), Buffer.from(b64, 'base64'));
+      }
+    }
+
     // DSL JSON 临时文件
     const dslPath = path.join(tmpDir, 'dsl.json');
     fs.writeFileSync(dslPath, JSON.stringify(dsl), 'utf8');
@@ -147,15 +213,18 @@ async function convert(dsl) {
 
     // 5. 解析结果
     const result = parseWasmResult(raw);
+    if (result.error) return result;
+
+    // 6. 打包 zip
+    const zipBuf = buildZip(tmpDir, result.hex, placeholders);
 
     // 合并 fetch 阶段的 missing 与 WASM 报告的 missing
     const allMissing = [...fetchMissing, ...(result.missing_keys || [])];
-    if (allMissing.length > 0) result.missing_keys = [...new Set(allMissing)];
-    else delete result.missing_keys;
-
-    return result;
+    const out = { zip: zipBuf.toString('base64') };
+    if (allMissing.length > 0) out.missing_keys = [...new Set(allMissing)];
+    return out;
   } finally {
-    // 6. 无论成功失败都清理临时目录
+    // 7. 无论成功失败都清理临时目录
     try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
   }
 }

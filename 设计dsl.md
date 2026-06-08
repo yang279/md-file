@@ -270,13 +270,13 @@
 
 ## PlaceholderMeta
 
-占位符标记数据，用于标记临时替代图层，提示未来需要替换为正式组件或资源。placeholder 数据会写入 Pixso 文件的 pluginData 字段，便于后续处理。
+占位符标记数据，用于标记需要替换为 SVG 或图片资源的图层。仅 SVG 和图片类型的图层会使用占位符。placeholder 数据会写入 Pixso 文件的 pluginData 字段，便于后续处理。
 
 | 字段 | 类型 | 必选 | 说明 |
 |---|---|---|---|
 | `is_placeholder` | boolean | 是 | 是否为占位符 |
-| `replacement_type` | string | 是 | 建议替换类型，当前支持：<br>• `"instance"` - 云端组件实例<br>• `"vector"` - 矢量路径<br>• `"image"` - 图片填充<br>未来可扩展其他类型 |
-| `note` | string | 否 | 人工备注说明（不限制长度）|
+| `replacement_type` | `"svg"` \| `"image"` | 是 | 替换类型：<br>• `"svg"` - 矢量 SVG 资源<br>• `"image"` - 图片资源 |
+| `note` | string | 否 | SVG 或图片的详细数据（SVG 字符串 或 图片 base64）|
 
 **pluginData 写入规则**：
 - 当图层包含 `placeholder` 字段时，解析器会将其写入 PixsoNode 的 pluginData 数组
@@ -292,8 +292,8 @@
   "type": "ellipse",
   "placeholder": {
     "is_placeholder": true,
-    "replacement_type": "instance",
-    "note": "密码输入框的眼睛图标"
+    "replacement_type": "svg",
+    "note": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\">...</svg>"
   },
   "box": { "x": 404, "y": 372, "width": 20, "height": 20 }
 }

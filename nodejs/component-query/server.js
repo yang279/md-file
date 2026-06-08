@@ -65,26 +65,26 @@ async function handle(req, res) {
     return sendJSON(res, 200, { status: 'ok', ...searcher.stats });
   }
 
-  // POST /query
-  if (req.method === 'POST' && url.pathname === '/query') {
-    let body;
-    try {
-      body = JSON.parse(await readBody(req));
-    } catch {
-      return sendJSON(res, 400, { error: 'invalid JSON body' });
-    }
-
-    const { name, props } = body;
-    if (!name || typeof name !== 'string' || !name.trim()) {
-      return sendJSON(res, 400, { error: 'name (string) is required' });
-    }
-    if (props !== undefined && (typeof props !== 'object' || Array.isArray(props))) {
-      return sendJSON(res, 400, { error: 'props must be an object' });
-    }
-
-    const result = await searcher.query({ name, props });
-    return sendJSON(res, 200, result);
-  }
+  // POST /query（暂时停用）
+  // if (req.method === 'POST' && url.pathname === '/query') {
+  //   let body;
+  //   try {
+  //     body = JSON.parse(await readBody(req));
+  //   } catch {
+  //     return sendJSON(res, 400, { error: 'invalid JSON body' });
+  //   }
+  //
+  //   const { name, props } = body;
+  //   if (!name || typeof name !== 'string' || !name.trim()) {
+  //     return sendJSON(res, 400, { error: 'name (string) is required' });
+  //   }
+  //   if (props !== undefined && (typeof props !== 'object' || Array.isArray(props))) {
+  //     return sendJSON(res, 400, { error: 'props must be an object' });
+  //   }
+  //
+  //   const result = await searcher.query({ name, props });
+  //   return sendJSON(res, 200, result);
+  // }
 
   // GET /hex/:key
   if (req.method === 'GET' && url.pathname.startsWith('/hex/')) {
