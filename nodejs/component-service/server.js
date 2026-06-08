@@ -34,6 +34,14 @@ const LIB_OUT_DIR = process.env.LIB_OUT_DIR
 
 app.use(express.json());
 
+// 统一打印接口异常：/match 等接口报错时仅把 err.message 透传给调用方，
+// 不打日志的话出现 timeout 等问题完全无从排查——这里在响应前先落一条 server 端日志，
+// 带上时间戳、接口路径与简要请求信息，方便对照 match_variant 里的 LLM 调用日志定位卡在哪一步
+function logRouteError(label, err, extra) {
+  const extraStr = extra ? ` (${extra})` : '';
+  console.error(`[${new Date().toISOString()}] ${label}${extraStr} 失败：${err.message}`);
+}
+
 // ---------------------------------------------------------------------------
 // 启动时根据 search_index.json 构建 hexKey → 绝对路径 的映射
 // hexKey 取自 hexFile 的文件名（不含扩展名），如 "component/93_55829.txt" → "93_55829"
@@ -110,6 +118,7 @@ app.post('/rebuild-index', (req, res) => {
     clearIndexCache();
     res.json({ ...result, hex_keys: hexKeys });
   } catch (err) {
+    logRouteError('POST /rebuild-index', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -158,6 +167,7 @@ app.post('/match', async (req, res) => {
     if (!result) return res.status(404).json({ error: 'no match found' });
     res.json(result);
   } catch (err) {
+    logRouteError('POST /match', err, `description="${description.trim()}"`);
     res.status(500).json({ error: err.message });
   }
 });
@@ -196,6 +206,7 @@ app.post('/batch', async (req, res) => {
     const results = await matchVariants(descriptions.map(d => d?.trim?.() ?? d));
     res.json(results);
   } catch (err) {
+    logRouteError('POST /batch', err, `${descriptions.length} 条描述`);
     res.status(500).json({ error: err.message });
   }
 });
@@ -224,6 +235,7 @@ app.post('/match-dsl', upload.single('file'), async (req, res) => {
     const results = await matchDsl(nodeData);
     res.json(results);
   } catch (err) {
+    logRouteError('POST /match-dsl', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -236,8 +248,8 @@ app.post('/match-dsl', upload.single('file'), async (req, res) => {
 // 传了 source：跳过打包，直接把 component/ 写入 LIB_OUT_DIR/{source}/，免去手动解压挪动。
 //
 // 无论哪种方式，这一步都只完成"拆解落盘"，产物要真正接入查询/匹配能力，
-// 仍需按 API.md「新增组件库」一节继续走：登记 SOURCES → 重新生成 search_index.json →
-// 同步到本服务 → 重启验证。
+// 仍需按 API.md「新增组件库」一节继续走：POST /sources 注册 → POST /rebuild-index
+// 重建索引并热重载。
 
 const SPLIT_UPLOAD_LIMIT = 200 * 1024 * 1024; // 200MB，.pix 库文件可能较大
 const splitUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: SPLIT_UPLOAD_LIMIT } });
@@ -264,6 +276,7 @@ app.post('/split', splitUpload.single('file'), async (req, res) => {
     if (result.error) return res.status(500).json({ error: result.error });
     res.json(result);
   } catch (err) {
+    logRouteError('POST /split', err, req.file.originalname);
     res.status(500).json({ error: err.message });
   }
 });

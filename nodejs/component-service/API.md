@@ -22,16 +22,18 @@ PORT=3102 LIB_OUT_DIR=/path/to/lib-out node server.js
 
 启动时会先加载同目录下的 `.env`（不存在的变量才会被设置，不会覆盖已有的环境变量），再读取 `search_index.json` 构建 hex key → 文件路径的映射并打印加载到的 key 数量。
 
-**配置项**（可写入 `.env`，也可在启动时用环境变量覆盖）：
+**配置项**（建议都写进 `.env`，避免每次启动靠记忆手动传环境变量；启动时用环境变量传入的值优先级更高，会覆盖 `.env`）：
 
 | 变量 | 默认值 | 说明 |
 |---|---|---|
 | `PORT` | `3102` | 监听端口 |
-| `LIB_OUT_DIR` | `../../pixso-parse/pix-split/lib-out` | 多组件库根目录，`search_index.json` 中每条 entry 的 `hexFile` 相对此目录下的 `{source}/` 解析。**建议直接写进 `.env`**——这样不必每次启动都记得通过环境变量传入，尤其是部署环境需要指向非默认路径时 |
-| `DASHSCOPE_API_KEY` | 见 `.env` | LLM（DeepSeek）调用密钥，`/match`、`/batch`、`/match-dsl` 依赖 |
-| `MODEL` | `deepseek-v4-flash` | LLM 模型名，可在 `.env` 中改为 `deepseek-v4-pro` |
+| `LIB_OUT_DIR` | `../../pixso-parse/pix-split/lib-out` | 多组件库根目录，`search_index.json` 中每条 entry 的 `hexFile` 相对此目录下的 `{source}/` 解析。仅当部署环境需要指向非默认路径时才需要配置 |
+| `DASHSCOPE_API_KEY` | — | LLM 调用密钥（必填），`/match`、`/batch`、`/match-dsl` 依赖 |
+| `LLM_BASE_URL` | `https://api.deepseek.com/v1` | LLM 接口地址 |
+| `MODEL` | `deepseek-v4-flash` | LLM 模型名，可改为 `deepseek-v4-pro` |
+| `LLM_TIMEOUT_MS` | `60000` | 单次 LLM 请求超时（毫秒）。排查 `/match` 报 `timeout` 时可调大此值 |
 
-> `.env` 已包含 `DASHSCOPE_API_KEY`，并以注释形式给出了 `LIB_OUT_DIR` 的配置示例（默认走代码内置的相对路径，本地启动无需额外配置；只有指向非默认路径时才需要取消注释填入实际值）。
+> `.env` 已预置好上述所有项（`LIB_OUT_DIR` 默认注释掉，走代码内置的相对路径；本地启动无需额外配置）。`LLM_*` 几项原本散落在代码默认值里，现在全部集中到 `.env`，改密钥/换模型/调超时都只需改这一个文件，无需碰代码或记环境变量。
 
 ---
 
@@ -292,7 +294,25 @@ curl -s -X POST http://localhost:3102/match -H "Content-Type: application/json" 
 
 **响应 404：** `{ "error": "no match found" }`
 
-> 实测单条匹配耗时约 5~6 秒（内部 2 次 LLM 调用：语义提取 + 精选）。
+> 实测单条匹配耗时约 5~6 秒（内部最多 3 次 LLM 调用：语义提取 → 选组件集 → 精选变体）。
+
+**响应 500 — 报 `timeout` 时怎么排查：**
+
+接口本身只把 `err.message` 透传给调用方（如 `{ "error": "Request timed out." }`），看不出卡在哪一步。请直接看 `component-service` 的进程日志（`node server.js` 的标准输出 / 标准错误），里面会有这样的逐步耗时记录：
+
+```
+[match_variant] matchVariant 开始：「主按钮大号」
+[match_variant] normalizeQuery（语义提取） → 调用 https://api.deepseek.com/v1 (model=deepseek-v4-flash, timeout=60000ms)
+[match_variant] normalizeQuery（语义提取） ✓ 完成，耗时 1016ms
+[match_variant] selectComponentSet（选组件集） → 调用 https://api.deepseek.com/v1 (model=deepseek-v4-flash, timeout=60000ms)
+[match_variant] selectComponentSet（选组件集） ✗ 失败，耗时 60003ms：Request timed out.
+[2026-06-08T08:00:00.000Z] POST /match (description="主按钮大号") 失败：Request timed out.
+```
+
+据此可以判断：
+- **卡在哪一步**：`normalizeQuery` / `selectComponentSet` / `selectVariant` 三步分别对应"语义提取 / 选组件集 / 精选变体"，日志里 `→ 调用` 之后长时间没有 `✓`/`✗`，就是卡在那一步
+- **是真超时还是网络/密钥问题**：耗时接近 `LLM_TIMEOUT_MS`（默认 60000ms）通常是连不通 `LLM_BASE_URL` 或对端响应慢；耗时很短就报错（如几十~几百毫秒）通常是 `DASHSCOPE_API_KEY` 无效、`MODEL` 名称错误等鉴权/参数问题，错误信息里一般会带 HTTP 状态码或具体原因
+- **如何调整**：先在 `.env` 里把 `LLM_TIMEOUT_MS` 调大排除"网络慢但最终能通"的情况；确认 `LLM_BASE_URL`/`DASHSCOPE_API_KEY`/`MODEL` 三项配置正确（详见上方[启动](#启动)一节的配置表）
 
 ---
 

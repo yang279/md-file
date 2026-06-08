@@ -8,7 +8,9 @@ const { matchVariant } = require('./match_variant');
 const envFile = path.resolve(__dirname, '.env');
 if (fs.existsSync(envFile)) {
   fs.readFileSync(envFile, 'utf8').split('\n').forEach(line => {
-    const [k, v] = line.split('=');
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const [k, v] = trimmed.split('=');
     if (k && v && !process.env[k.trim()]) process.env[k.trim()] = v.trim();
   });
 }
@@ -24,6 +26,7 @@ async function matchVariants(descriptions, concurrency = 5) {
       try {
         results[i] = await matchVariant(desc);
       } catch (err) {
+        console.error(`[batch_match] 第 ${i} 条「${desc}」失败：${err.message}`);
         results[i] = { error: err.message, description: desc };
       }
     }

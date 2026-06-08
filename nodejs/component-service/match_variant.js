@@ -9,17 +9,46 @@ const OpenAI = require('openai');
 const envFile = path.resolve(__dirname, '.env');
 if (fs.existsSync(envFile)) {
   fs.readFileSync(envFile, 'utf8').split('\n').forEach(line => {
-    const [k, v] = line.split('=');
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const [k, v] = trimmed.split('=');
     if (k && v && !process.env[k.trim()]) process.env[k.trim()] = v.trim();
   });
 }
 
+// LLM 相关配置全部可在 .env 中覆盖：
+//   DASHSCOPE_API_KEY  调用密钥（必填）
+//   LLM_BASE_URL       接口地址，默认指向 DeepSeek
+//   MODEL              模型名，默认 deepseek-v4-flash
+//   LLM_TIMEOUT_MS     单次请求超时（毫秒），默认 60000；命中超时时 err.message 形如
+//                      "Request timed out." / "Connection error."，会被下面的 callLLM 打到日志里
+const BASE_URL   = process.env.LLM_BASE_URL || 'https://api.deepseek.com/v1';
+const MODEL      = process.env.MODEL || 'deepseek-v4-flash';
+const TIMEOUT_MS = Number(process.env.LLM_TIMEOUT_MS) || 60_000;
+
 const client = new OpenAI({
   apiKey:  process.env.DASHSCOPE_API_KEY,
-  baseURL: 'https://api.deepseek.com/v1',
+  baseURL: BASE_URL,
+  timeout: TIMEOUT_MS,
 });
+
 const SEARCH_INDEX = path.resolve(__dirname, 'search_index.json');
-const MODEL        = process.env.MODEL || 'deepseek-v4-flash';
+
+// 包一层日志：记录每次 LLM 调用的发起/耗时/失败原因——
+// /match 等接口报错只会把 err.message 透传给调用方，本身不打印任何东西，
+// 出现 "timeout" 时单看接口响应不知道是哪一步、卡了多久，必须靠这里的日志定位
+async function callLLM(label, params) {
+  const start = Date.now();
+  console.log(`[match_variant] ${label} → 调用 ${BASE_URL} (model=${MODEL}, timeout=${TIMEOUT_MS}ms)`);
+  try {
+    const response = await client.chat.completions.create(params);
+    console.log(`[match_variant] ${label} ✓ 完成，耗时 ${Date.now() - start}ms`);
+    return response;
+  } catch (err) {
+    console.error(`[match_variant] ${label} ✗ 失败，耗时 ${Date.now() - start}ms：${err.message}`);
+    throw err;
+  }
+}
 
 let _index = null;
 function loadIndex() {
@@ -35,7 +64,7 @@ function clearIndexCache() {
 // ── 第一步：LLM 语义提取 → 中文搜索关键词 ────────────────────────────────────
 
 async function normalizeQuery(description) {
-  const response = await client.chat.completions.create({
+  const response = await callLLM('normalizeQuery（语义提取）', {
     model: MODEL,
     max_tokens: 512,
     thinking: { type: 'disabled' },
@@ -92,7 +121,7 @@ async function selectComponentSet(description, candidates) {
     `【${cs.name}】(${cs.sourceLabel}) key: ${cs.componentKey || cs.guid} | ${(cs.variants || []).length} 个变体`
   ).join('\n');
 
-  const response = await client.chat.completions.create({
+  const response = await callLLM('selectComponentSet（选组件集）', {
     model: MODEL,
     max_tokens: 256,
     thinking: { type: 'disabled' },
@@ -138,7 +167,7 @@ async function selectVariant(description, entry) {
     .map(v => `  - ${v.variantKey || v.guid} | ${v.name}`)
     .join('\n');
 
-  const response = await client.chat.completions.create({
+  const response = await callLLM('selectVariant（精选变体）', {
     model: MODEL,
     max_tokens: 512,
     thinking: { type: 'disabled' },
@@ -173,6 +202,7 @@ async function selectVariant(description, entry) {
 
 async function matchVariant(description) {
   const { entries } = loadIndex();
+  console.log(`[match_variant] matchVariant 开始：「${description}」`);
 
   // Step 1: LLM 语义提取
   const keywords = await normalizeQuery(description);
