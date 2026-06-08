@@ -33,7 +33,6 @@ async function normalizeQuery(description) {
   const response = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 512,
-    thinking: { type: 'disabled' },
     messages: [
       {
         role: 'system',
@@ -76,86 +75,39 @@ function localFilter(query, entries, topK = 10) {
     .map(x => x.entry);
 }
 
-// ── 第三步 A：LLM 选组件集（轻量 prompt：仅名称 + 变体数量，不展开变体）────────
-//
-// 候选集的全部变体名 token 量很大（少数组件集变体数上百），一次性塞给模型会让
-// prompt 膨胀到上万 token。先用极小的 prompt 让模型按"组件集语义"判断该选哪个集合，
-// 这一步本身不需要看变体细节也能判断准确。
+// ── 第三步：LLM 精选变体 ──────────────────────────────────────────────────────
 
-async function selectComponentSet(description, candidates) {
-  const list = candidates.map(cs =>
-    `【${cs.name}】(${cs.sourceLabel}) key: ${cs.componentKey || cs.guid} | ${(cs.variants || []).length} 个变体`
-  ).join('\n');
-
-  const response = await client.chat.completions.create({
-    model: MODEL,
-    max_tokens: 256,
-    thinking: { type: 'disabled' },
-    tools: [{
-      type: 'function',
-      function: {
-        name: 'select_component_set',
-        description: '选出与描述最匹配的组件集',
-        parameters: {
-          type: 'object',
-          properties: {
-            componentKey: { type: 'string', description: '所选组件集的 componentKey 或 guid' },
-          },
-          required: ['componentKey'],
-        },
-      },
-    }],
-    tool_choice: 'auto',
-    messages: [{
-      role: 'user',
-      content: `从以下候选组件集中，选出与描述最匹配的一个。\n\n描述：${description}\n\n候选：\n${list}`,
-    }],
-  });
-
-  const toolCall = response.choices[0]?.message?.tool_calls?.[0];
-  if (!toolCall) return null;
-  const { componentKey } = JSON.parse(toolCall.function.arguments);
-  return candidates.find(c => c.componentKey === componentKey || c.guid === componentKey) || null;
-}
-
-// ── 第三步 B：LLM 在选定组件集内精选变体（仅展开这一个集合的变体）────────────
-//
-// 缩小到单一组件集后，prompt 只包含它自己的变体列表，既比"10 个集合的全部变体"
-// 小得多，又因为去掉了其他候选集的干扰信息，模型更容易聚焦比对变体差异。
-
-async function selectVariant(description, entry) {
-  const variants = entry.variants || [];
-  if (variants.length === 0) {
-    return { variantKey: null, reason: '该组件为 standalone，无变体' };
-  }
-
-  const variantLines = variants
-    .map(v => `  - ${v.variantKey || v.guid} | ${v.name}`)
-    .join('\n');
+async function llmRerank(description, candidates) {
+  const sections = candidates.map(cs => {
+    const variantLines = (cs.variants || [])
+      .map(v => `  - ${v.variantKey || v.guid} | ${v.name}`)
+      .join('\n');
+    return `【${cs.name}】(${cs.sourceLabel})\nkey: ${cs.componentKey || cs.guid}\n变体:\n${variantLines || '  (无变体，standalone)'}`;
+  }).join('\n\n');
 
   const response = await client.chat.completions.create({
     model: MODEL,
-    max_tokens: 512,
-    thinking: { type: 'disabled' },
+    max_tokens: 2048,
     tools: [{
       type: 'function',
       function: {
         name: 'select_variant',
-        description: '从指定组件集的变体中选出与描述最匹配的一个',
+        description: '选出与描述最匹配的具体变体',
         parameters: {
           type: 'object',
           properties: {
-            variantKey: { type: 'string', description: '变体的 variantKey 或 guid' },
-            reason:     { type: 'string', description: '一句话说明匹配理由' },
+            componentKey: { type: 'string', description: '所属组件的 componentKey 或 guid' },
+            variantKey:   { type: 'string', description: '变体的 variantKey 或 guid' },
+            reason:       { type: 'string', description: '一句话说明匹配理由' },
           },
-          required: ['variantKey'],
+          required: ['componentKey', 'variantKey'],
         },
       },
     }],
     tool_choice: 'auto',
     messages: [{
       role: 'user',
-      content: `组件集【${entry.name}】(${entry.sourceLabel}) 有以下变体，选出与描述最匹配的一个。\n\n描述：${description}\n\n变体：\n${variantLines}`,
+      content: `从以下候选组件中，选出与描述最匹配的一个变体。\n\n描述：${description}\n\n候选：\n${sections}`,
     }],
   });
 
@@ -176,15 +128,14 @@ async function matchVariant(description) {
   const candidates = localFilter(keywords, entries, 10);
   if (candidates.length === 0) return null;
 
-  // Step 3a: LLM 选组件集（轻量 prompt，不含变体明细）
-  const entry = await selectComponentSet(description, candidates);
+  // Step 3: LLM 精选，传原始描述（语义更完整）
+  const result = await llmRerank(description, candidates);
+  if (!result) return null;
+
+  const { componentKey, variantKey, reason } = result;
+  const entry = entries.find(e => e.componentKey === componentKey || e.guid === componentKey);
   if (!entry) return null;
 
-  // Step 3b: LLM 在选定组件集内精选变体（仅传该集合自己的变体）
-  const picked = await selectVariant(description, entry);
-  if (!picked) return null;
-
-  const { variantKey, reason } = picked;
   const variant = (entry.variants || []).find(v => v.variantKey === variantKey || v.guid === variantKey);
 
   return {
@@ -193,9 +144,6 @@ async function matchVariant(description) {
     componentSetName: entry.name,
     componentKey:     entry.componentKey || entry.guid,
     hexFile:          entry.hexFile,
-    // 相对 LIB_OUT_DIR 的完整路径（= source + '/' + hexFile），可直接写入设计 DSL 的
-    // instance.path 字段，供 dsl-to-hex 拼 HEX_LIB_DIR 后本地读取，无需再调用本服务
-    path:             entry.source && entry.hexFile ? `${entry.source}/${entry.hexFile}` : null,
     variant:          variant
       ? { name: variant.name, variantKey: variant.variantKey || variant.guid, guid: variant.guid }
       : null,

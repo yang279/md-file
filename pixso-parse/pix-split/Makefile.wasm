@@ -1,9 +1,6 @@
-CXX    = clang++
-CC     = clang
-CXXFLAGS = -std=c++17 -O2 -I.. -I../kiwi-master -I../zstd-1.5.6/lib
-CFLAGS   = -O2 -I../zstd-1.5.6/lib
+EMCC = $(HOME)/emsdk/python/3.13.3_64bit/bin/python3 $(HOME)/emsdk/upstream/emscripten/emcc.py
 
-ZSTD_COMMON = \
+ZSTD_SRCS = \
 	../zstd-1.5.6/lib/common/debug.c \
 	../zstd-1.5.6/lib/common/entropy_common.c \
 	../zstd-1.5.6/lib/common/error_private.c \
@@ -11,15 +8,11 @@ ZSTD_COMMON = \
 	../zstd-1.5.6/lib/common/pool.c \
 	../zstd-1.5.6/lib/common/threading.c \
 	../zstd-1.5.6/lib/common/xxhash.c \
-	../zstd-1.5.6/lib/common/zstd_common.c
-
-ZSTD_DECOMP = \
+	../zstd-1.5.6/lib/common/zstd_common.c \
 	../zstd-1.5.6/lib/decompress/huf_decompress.c \
 	../zstd-1.5.6/lib/decompress/zstd_ddict.c \
 	../zstd-1.5.6/lib/decompress/zstd_decompress.c \
-	../zstd-1.5.6/lib/decompress/zstd_decompress_block.c
-
-ZSTD_COMP = \
+	../zstd-1.5.6/lib/decompress/zstd_decompress_block.c \
 	../zstd-1.5.6/lib/compress/fse_compress.c \
 	../zstd-1.5.6/lib/compress/hist.c \
 	../zstd-1.5.6/lib/compress/huf_compress.c \
@@ -33,30 +26,37 @@ ZSTD_COMP = \
 	../zstd-1.5.6/lib/compress/zstd_ldm.c \
 	../zstd-1.5.6/lib/compress/zstd_opt.c
 
-ZSTD_SRCS = $(ZSTD_COMMON) $(ZSTD_DECOMP) $(ZSTD_COMP)
-ZSTD_OBJS = $(ZSTD_SRCS:.c=.o)
+TARGET    = split_compset
+BIN_JS    = bin/$(TARGET).js
+BIN_WASM  = bin/$(TARGET).wasm
+ZSTD_OBJS = $(ZSTD_SRCS:.c=.wasm.o)
 
-BIN = bin/split_compset
-
-all: bin $(BIN)
+all: bin $(BIN_JS)
 
 bin:
 	mkdir -p bin
 
-$(BIN): split_compset.cpp split_compset_core.h $(ZSTD_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ split_compset.cpp $(ZSTD_OBJS)
+# 单独编译 zstd C 文件
+%.wasm.o: %.c
+	$(EMCC) -O2 -I../zstd-1.5.6/lib -c -o $@ $<
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-# 示例：拆解组件库并输出到 harmony_out/
-test: $(BIN)
-	$(BIN) build_index \
-		"../HarmonyOS Component Library（来自社区）.pix" \
-		harmony_out \
-		--publish-file QcO-1WDViGmGQ4IFU_p4FQ
+# 链接主文件，输出到 bin/
+$(BIN_JS): split_compset_wasm.cpp split_compset_core.h $(ZSTD_OBJS)
+	$(EMCC) -std=c++17 -O2 \
+		-I.. -I../kiwi-master -I../zstd-1.5.6/lib \
+		--bind \
+		-s WASM=1 \
+		-s MODULARIZE=1 \
+		-s EXPORT_NAME="SplitCompset" \
+		-s ALLOW_MEMORY_GROWTH=1 \
+		-s INITIAL_MEMORY=67108864 \
+		-s NODERAWFS=1 \
+		-s ENVIRONMENT='node' \
+		-o $(BIN_JS) \
+		split_compset_wasm.cpp $(ZSTD_OBJS)
+	@echo "✓ 生成: $(BIN_JS) + $(BIN_WASM)"
 
 clean:
-	rm -f $(BIN) $(ZSTD_OBJS)
+	rm -f $(BIN_JS) $(BIN_WASM) $(ZSTD_OBJS)
 
-.PHONY: all bin test clean
+.PHONY: all clean

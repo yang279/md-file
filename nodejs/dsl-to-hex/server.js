@@ -1,7 +1,7 @@
 'use strict';
 
 const http      = require('http');
-const { convert, getWasm } = require('./converter');
+const { convert, getWasm, HEX_LIB_DIR } = require('./converter');
 
 // ---------------------------------------------------------------------------
 // 配置
@@ -87,9 +87,8 @@ async function main() {
   });
 
   server.listen(PORT, () => {
-    const queryUrl = process.env.COMPONENT_QUERY_URL || 'http://localhost:3000';
     console.log(`\nDSL转hex服务已启动: http://localhost:${PORT}`);
-    console.log(`COMPONENT_QUERY_URL: ${queryUrl}\n`);
+    console.log(`HEX_LIB_DIR: ${HEX_LIB_DIR}\n`);
   });
 }
 

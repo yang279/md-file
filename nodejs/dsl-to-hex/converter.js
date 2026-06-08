@@ -3,9 +3,22 @@
 const fs   = require('fs');
 const os   = require('os');
 const path = require('path');
-const http  = require('http');
-const https = require('https');
 const { spawnSync } = require('child_process');
+
+// 自动加载同目录 .env
+const envFile = path.resolve(__dirname, '.env');
+if (fs.existsSync(envFile)) {
+  fs.readFileSync(envFile, 'utf8').split('\n').forEach(line => {
+    const [k, v] = line.split('=');
+    if (k && v && !process.env[k.trim()]) process.env[k.trim()] = v.trim();
+  });
+}
+
+// 组件库 hex 根目录：与 component-service 的 LIB_OUT_DIR 指向同一份数据。
+// DSL 中 instance.path 是相对此目录的路径（如 "h-design-chart/component/93_55829.txt"），
+// 拼接后直接读本地文件，无需再请求 component-service 的 /hex/:key 接口。
+const HEX_LIB_DIR = process.env.HEX_LIB_DIR
+  || path.resolve(__dirname, '../../pixso-parse/pix-split/lib-out');
 
 // ---------------------------------------------------------------------------
 // WASM 单例（服务生命周期内只初始化一次）
@@ -28,27 +41,30 @@ async function getWasm() {
 }
 
 // ---------------------------------------------------------------------------
-// 遍历 DSL 图层树，收集所有不重复的 component_set_key
+// 遍历 DSL 图层树，收集所有不重复的 { component_set_key, path } 引用
+// path 为相对 HEX_LIB_DIR 的 hex 文件路径（如 "h-design-chart/component/93_55829.txt"），
+// 由 component-service 匹配结果中的 path 字段（= source + '/' + hexFile）直接写入 DSL
 // ---------------------------------------------------------------------------
-function collectKeys(layer, out) {
+function collectHexRefs(layer, out) {
   if (layer.type === 'instance') {
-    const key = layer.instance && layer.instance.component_set_key;
-    if (key) out.add(key);
+    const inst = layer.instance;
+    const key = inst && inst.component_set_key;
+    if (key && !out.has(key)) out.set(key, inst.path || null);
     return; // instance 不含 children
   }
   for (const child of layer.children || []) {
-    collectKeys(child, out);
+    collectHexRefs(child, out);
   }
 }
 
-function extractComponentKeys(dsl) {
-  const keys = new Set();
+function extractHexRefs(dsl) {
+  const refs = new Map(); // key → path
   for (const page of dsl.pages || []) {
     for (const layer of page.layers || []) {
-      collectKeys(layer, keys);
+      collectHexRefs(layer, refs);
     }
   }
-  return [...keys];
+  return [...refs.entries()].map(([key, relPath]) => ({ key, path: relPath }));
 }
 
 // ---------------------------------------------------------------------------
@@ -83,47 +99,24 @@ function idToGuid(id) {
 }
 
 // ---------------------------------------------------------------------------
-// HTTP GET 工具（不依赖第三方库）
+// 按 path 字段直接拼本地路径，读取所有组件的 hex 内容
 // ---------------------------------------------------------------------------
-function httpGet(url) {
-  return new Promise((resolve, reject) => {
-    const mod = url.startsWith('https:') ? https : http;
-    const req = mod.get(url, res => {
-      if (res.statusCode !== 200) {
-        res.resume();
-        const err = new Error(`HTTP ${res.statusCode}: ${url}`);
-        err.statusCode = res.statusCode;
-        return reject(err);
-      }
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end',  () => resolve(Buffer.concat(chunks).toString('utf8')));
-    });
-    req.on('error', reject);
-  });
-}
-
-// ---------------------------------------------------------------------------
-// 并发拉取所有组件的 hex 内容
-// ---------------------------------------------------------------------------
-async function fetchAllHex(keys, queryBaseUrl) {
-  const results = await Promise.allSettled(
-    keys.map(async key => {
-      const content = await httpGet(`${queryBaseUrl}/hex/${key}`);
-      return { key, content };
-    })
-  );
-
-  const hexMap     = {};
+async function readAllHex(refs) {
+  const hexMap      = {};
   const missingKeys = [];
-  for (const r of results) {
-    if (r.status === 'fulfilled') {
-      hexMap[r.value.key] = r.value.content;
-    } else {
-      // 取 key 名（从 URL 末尾或错误信息里提取不到时兜底）
-      const key = r.reason?.message?.match(/\/hex\/([a-f0-9]{40})/)?.[1] || 'unknown';
+
+  for (const { key, path: relPath } of refs) {
+    if (!relPath) {
       missingKeys.push(key);
-      console.warn(`[WARN] 组件 hex 拉取失败: ${r.reason?.message}`);
+      console.warn(`[WARN] 组件缺少 path 字段，无法定位 hex 文件: ${key}`);
+      continue;
+    }
+    const filePath = path.join(HEX_LIB_DIR, relPath);
+    try {
+      hexMap[key] = await fs.promises.readFile(filePath, 'utf8');
+    } catch (err) {
+      missingKeys.push(key);
+      console.warn(`[WARN] 组件 hex 读取失败: ${filePath} (${err.message})`);
     }
   }
   return { hexMap, missingKeys };
@@ -174,13 +167,11 @@ function parseWasmResult(raw) {
 // 主转换函数
 // ---------------------------------------------------------------------------
 async function convert(dsl) {
-  const queryBaseUrl = (process.env.COMPONENT_QUERY_URL || 'http://localhost:3100').replace(/\/$/, '');
+  // 1. 提取所有 { component_set_key, path } 引用
+  const refs = extractHexRefs(dsl);
 
-  // 1. 提取所有 component_set_key
-  const keys = extractComponentKeys(dsl);
-
-  // 2. 并发拉取 hex 内容
-  const { hexMap, missingKeys: fetchMissing } = await fetchAllHex(keys, queryBaseUrl);
+  // 2. 按 path 拼本地路径，直接读取 hex 内容
+  const { hexMap, missingKeys: fetchMissing } = await readAllHex(refs);
 
   // 3. 写临时目录
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pix-'));
@@ -229,4 +220,4 @@ async function convert(dsl) {
   }
 }
 
-module.exports = { convert, getWasm };
+module.exports = { convert, getWasm, HEX_LIB_DIR };

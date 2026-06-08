@@ -3,7 +3,7 @@
 接收设计 DSL JSON，调用 WASM 生成 Pixso 可导入的 hex 文件，并将 hex 与 placeholder 资源文件打包为 zip 返回。
 
 - 默认端口：`3101`
-- 依赖服务：[component-query](../component-query/)（负责提供组件 hex 数据；当前 `/query` 已停用，仅 `/hex/:key` 在用）
+- hex 数据来源：本地组件库根目录 `HEX_LIB_DIR`（与 [component-service](../component-service/) 的 `LIB_OUT_DIR` 指向同一份 `lib-out` 数据），按 DSL 中 instance 的 `path` 字段直接拼路径读取，不再依赖 component-service 的网络接口
 - 无外部 npm 依赖，使用系统 `zip` 命令打包
 
 ---
@@ -13,12 +13,14 @@
 ```bash
 cd nodejs/dsl-to-hex
 
-# 使用默认配置（component-query 须已在 3100 端口运行）
+# 使用默认配置（HEX_LIB_DIR 默认指向 ../../pixso-parse/pix-split/lib-out）
 node server.js
 
 # 自定义配置
-PORT=3101 COMPONENT_QUERY_URL=http://localhost:3100 node server.js
+PORT=3101 HEX_LIB_DIR=/path/to/lib-out node server.js
 ```
+
+也可在 `.env` 文件中配置 `HEX_LIB_DIR`（同目录自动加载，写法与 component-service 一致）。
 
 启动时会预热 WASM，加载成功后才开始监听请求。
 
@@ -27,7 +29,7 @@ PORT=3101 COMPONENT_QUERY_URL=http://localhost:3100 node server.js
 | 变量 | 默认值 | 说明 |
 |---|---|---|
 | `PORT` | `3101` | 监听端口 |
-| `COMPONENT_QUERY_URL` | `http://localhost:3100` | component-query 服务地址，用于拉取组件 hex 数据 |
+| `HEX_LIB_DIR` | `../../pixso-parse/pix-split/lib-out` | 组件库 hex 根目录；DSL 中 instance 的 `path` 字段是相对此目录的路径，拼接后直接读本地文件。须与 component-service 的 `LIB_OUT_DIR` 指向同一份数据 |
 | `WASM_PATH` | `./bin/dsl_to_hex.js` | WASM 加载器路径（`.wasm` 文件须在同目录） |
 
 ---
@@ -37,11 +39,11 @@ PORT=3101 COMPONENT_QUERY_URL=http://localhost:3100 node server.js
 ```
 POST /convert { dsl }
   │
-  ├─ 1. 扫描 DSL 图层树，收集所有 instance 图层的 component_set_key
-  ├─ 2. 并发请求 component-query GET /hex/{key}，获取组件 hex 内容
-  │      拉取失败的 key 记入 missing_keys，不中断流程
+  ├─ 1. 扫描 DSL 图层树，收集所有 instance 图层的 { component_set_key, path }
+  ├─ 2. 拼接 HEX_LIB_DIR + path，直接读取本地 hex 文件内容
+  │      缺少 path 字段或读取失败的 key 记入 missing_keys，不中断流程
   ├─ 3. 创建临时目录，写入：
-  │      {key}.txt        —— 组件 hex（供 WASM 查找）
+  │      {key}.txt        —— 组件 hex（供 WASM 查找，key 为 component_set_key）
   │      {guid}.svg/png   —— placeholder 资源文件
   │      dsl.json         —— DSL 输入
   ├─ 4. 调用 WASM：dslToHex(dslPath, tmpDir) → hex 字符串
@@ -50,6 +52,8 @@ POST /convert { dsl }
   ├─ 6. 清理临时目录
   └─ 返回 { zip: base64, missing_keys? }
 ```
+
+**`path` 字段从哪里来：** DSL 生成阶段调用 component-service 的 `/match`、`/batch` 或 `/match-dsl` 匹配组件时，匹配结果中已包含拼好的 `path` 字段（`= source + '/' + hexFile`，如 `"h-design-chart/component/93_55829.txt"`），原样写入 `instance.path` 即可，详见 [设计dsl.md](../设计dsl.md#cloudinstanceref)。
 
 ---
 
@@ -115,7 +119,7 @@ POST /convert { dsl }
 }
 ```
 
-`missing_keys` 存在时表示部分组件 hex 未能从 component-query 获取，对应 instance 节点在 Pixso 中将缺失，但 zip 仍有效可导入。
+`missing_keys` 存在时表示部分组件缺少 `path` 字段或本地 hex 文件读取失败，对应 instance 节点在 Pixso 中将缺失，但 zip 仍有效可导入。
 
 **响应 500 — WASM 转换失败：**
 

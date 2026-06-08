@@ -8,9 +8,10 @@ const multer            = require('multer');
 const { matchVariant }  = require('./match_variant');
 const { matchVariants } = require('./batch_match');
 const { matchDsl }      = require('./match_dsl');
+const { splitLibrary }  = require('./split_lib');
 
 const app    = express();
-const PORT   = Number(process.env.PORT) || 3100;
+const PORT   = Number(process.env.PORT) || 3102;
 const upload = multer({ storage: multer.memoryStorage() });
 
 // 多组件库根目录：search_index.json 中每个 entry 的 hexFile 是相对 lib-out/{source}/ 的路径
@@ -50,12 +51,44 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', hex_keys: hexPathMap.size });
 });
 
+// description 应为简短自然语言描述（如"主按钮大号"），不能是序列化的 JSON 对象/数组——
+// 后者会被逐字嵌入多次 LLM 调用的 prompt（normalizeQuery + selectComponentSet + selectVariant），
+// 既无法被正确语义匹配，又徒增数倍 token 消耗。match-dsl 走的是 collectNodes 提取 label 后再匹配，
+// 不受影响；这里专门拦在 /match、/batch 的入口。
+const MAX_DESCRIPTION_LENGTH = 200;
+
+function checkDescription(desc) {
+  if (desc === undefined || desc === null || desc === '') {
+    return 'description is required';
+  }
+  if (typeof desc !== 'string') {
+    return 'description must be a string';
+  }
+  const trimmed = desc.trim();
+  if (!trimmed) {
+    return 'description is required';
+  }
+  if (trimmed.length > MAX_DESCRIPTION_LENGTH) {
+    return `description too long (max ${MAX_DESCRIPTION_LENGTH} chars) — pass a short natural-language description, not a serialized object`;
+  }
+  if (/^[{\[]/.test(trimmed)) {
+    try {
+      JSON.parse(trimmed);
+      return 'description must be a short natural-language text, not a serialized JSON object/array — extract a field like label/name first';
+    } catch {
+      // 不是合法 JSON，可能只是描述恰好以 { [ 开头，按普通文本放行
+    }
+  }
+  return null;
+}
+
 // ── POST /match ───────────────────────────────────────────────────────────────
 
 app.post('/match', async (req, res) => {
   const { description } = req.body || {};
-  if (!description || typeof description !== 'string') {
-    return res.status(400).json({ error: 'description is required' });
+  const descErr = checkDescription(description);
+  if (descErr) {
+    return res.status(400).json({ error: descErr });
   }
   try {
     const result = await matchVariant(description.trim());
@@ -85,6 +118,15 @@ app.post('/batch', async (req, res) => {
   }
   if (descriptions.length > 100) {
     return res.status(400).json({ error: 'max 100 descriptions per request' });
+  }
+
+  const invalid = [];
+  descriptions.forEach((d, i) => {
+    const err = checkDescription(d);
+    if (err) invalid.push({ index: i, error: err });
+  });
+  if (invalid.length > 0) {
+    return res.status(400).json({ error: 'invalid descriptions', details: invalid });
   }
 
   try {
@@ -118,6 +160,37 @@ app.post('/match-dsl', upload.single('file'), async (req, res) => {
   try {
     const results = await matchDsl(nodeData);
     res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /split ───────────────────────────────────────────────────────────────
+// 上传 .pix 组件库文件，调用 split_compset WASM 拆解为
+// {componentKey 或 sessionId_localId}.txt + component_index.json，
+// 打包为 zip 返回（zip 根目录即 component/，可直接解压进 lib-out/{source}/ 使用）。
+//
+// 这一步只负责"拆解"，产物要真正接入查询/匹配能力，仍需按
+// API.md「新增组件库」一节继续走：登记 SOURCES → 重新生成 search_index.json →
+// 同步到本服务 → 重启验证。
+
+const SPLIT_UPLOAD_LIMIT = 200 * 1024 * 1024; // 200MB，.pix 库文件可能较大
+const splitUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: SPLIT_UPLOAD_LIMIT } });
+
+app.post('/split', splitUpload.single('file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'send a .pix file via -F "file=@library.pix"' });
+  }
+
+  const publishFile = typeof req.body?.publishFile === 'string' ? req.body.publishFile.trim() : '';
+
+  try {
+    const result = await splitLibrary(req.file.buffer, {
+      originalName: req.file.originalname,
+      publishFile,
+    });
+    if (result.error) return res.status(500).json({ error: result.error });
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
