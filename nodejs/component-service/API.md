@@ -1,10 +1,10 @@
 # component-service 接口文档
 
-整合自两个来源的服务：
-- **查询接口**（`/match`、`/batch`、`/match-dsl`）—— 移植自 `pixso-parse/pix-split/enrich`，基于 LLM 的语义化组件变体匹配
-- **hex 获取接口**（`/hex/:key`）—— 沿用 `nodejs/component-query` 的逻辑，改造为跨多组件库查找
+组件服务，对外统一暴露在 **3102 端口**，提供两类能力：
+- **查询接口**（`/match`、`/batch`、`/match-dsl`）—— 基于 LLM 的语义化组件变体匹配
+- **hex 获取接口**（`/hex/:key`）—— 跨多组件库查找并返回组件的 hex 文件内容
 
-合并后对外统一暴露在 **3102 端口**，供 [dsl-to-hex](../dsl-to-hex/) 等下游服务使用。
+供其他服务使用。
 
 ---
 
@@ -16,28 +16,28 @@ cd nodejs/component-service
 # 默认配置（需要 search_index.json 与 lib-out 目录已就绪）
 node server.js
 
-# 自定义端口 / 组件库根目录
+# 也可以临时用环境变量覆盖 .env 里的配置（优先级更高）
 PORT=3102 LIB_OUT_DIR=/path/to/lib-out node server.js
 ```
 
-启动时会读取 `search_index.json` 构建 hex key → 文件路径的映射，并打印加载到的 key 数量。
+启动时会先加载同目录下的 `.env`（不存在的变量才会被设置，不会覆盖已有的环境变量），再读取 `search_index.json` 构建 hex key → 文件路径的映射并打印加载到的 key 数量。
 
-**环境变量：**
+**配置项**（可写入 `.env`，也可在启动时用环境变量覆盖）：
 
 | 变量 | 默认值 | 说明 |
 |---|---|---|
 | `PORT` | `3102` | 监听端口 |
-| `LIB_OUT_DIR` | `../../pixso-parse/pix-split/lib-out` | 多组件库根目录，`search_index.json` 中每条 entry 的 `hexFile` 相对此目录下的 `{source}/` 解析 |
+| `LIB_OUT_DIR` | `../../pixso-parse/pix-split/lib-out` | 多组件库根目录，`search_index.json` 中每条 entry 的 `hexFile` 相对此目录下的 `{source}/` 解析。**建议直接写进 `.env`**——这样不必每次启动都记得通过环境变量传入，尤其是部署环境需要指向非默认路径时 |
 | `DASHSCOPE_API_KEY` | 见 `.env` | LLM（DeepSeek）调用密钥，`/match`、`/batch`、`/match-dsl` 依赖 |
 | `MODEL` | `deepseek-v4-flash` | LLM 模型名，可在 `.env` 中改为 `deepseek-v4-pro` |
 
-> `.env` 文件已随服务一并复制，包含 `DASHSCOPE_API_KEY`，本地启动无需额外配置。
+> `.env` 已包含 `DASHSCOPE_API_KEY`，并以注释形式给出了 `LIB_OUT_DIR` 的配置示例（默认走代码内置的相对路径，本地启动无需额外配置；只有指向非默认路径时才需要取消注释填入实际值）。
 
 ---
 
 ## 数据来源说明
 
-`search_index.json`（移植自 enrich，653 条 entry）汇聚了三个组件库的索引：
+`search_index.json`（653 条 entry，由 [`POST /rebuild-index`](#post-rebuild-index) 基于 `sources.json` 生成）汇聚了三个组件库的索引：
 
 | source | sourceLabel | entry 数 | hex 文件命名格式 |
 |---|---|---|---|
@@ -53,112 +53,77 @@ PORT=3102 LIB_OUT_DIR=/path/to/lib-out node server.js
 
 服务启动时遍历所有 entry，以 `hexFile` 文件名（去掉扩展名）为 key 建立 `key → 绝对路径` 映射（实测 653 条 entry 无 key 冲突），从而让 `/hex/:key` 无需调用方关心组件来自哪个库。
 
-`/match`、`/batch`、`/match-dsl` 的匹配结果中额外带有拼好的 `path` 字段（`= source + '/' + hexFile`，如上例对应 `"h-design-chart/component/93_55829.txt"`），是相对 `LIB_OUT_DIR` 的完整路径。生成设计 DSL 时把它原样写进 instance 的 `path` 字段即可——`dsl-to-hex` 服务会用自己配置的 `HEX_LIB_DIR`（应指向同一份 `lib-out` 数据）拼接这个 `path` 直接读本地文件，不再调用本服务的 `/hex/:key` 接口。
+`/match`、`/batch`、`/match-dsl` 的匹配结果中额外带有拼好的 `path` 字段（`= source + '/' + hexFile`，如上例对应 `"h-design-chart/component/93_55829.txt"`），是相对 `LIB_OUT_DIR` 的完整路径。生成设计 DSL 时把它原样写进 instance 的 `path` 字段即可——使用方服务会用自己配置的 `HEX_LIB_DIR`（应指向同一份 `lib-out` 数据）拼接这个 `path` 直接读本地文件，不再调用本服务的 `/hex/:key` 接口。
 
 ---
 
-## 新增组件库：从「拆解」到「接入服务」全流程
+## 新增组件库：全程在 `component-service` 内完成
 
-当有一个新的 `.pix` 组件库被拆解出来后，它**不会自动**出现在 `component-service` 里——还需要手动走完"合并索引 → 同步到本服务"这几步。完整链路如下：
+当有一个新的 `.pix` 组件库需要接入时，**全部步骤都在本服务内完成**，无需借助任何外部脚本或手动复制文件。仅 `LIB_OUT_DIR` 指向的 hex 静态资源（`lib-out/{source}/component/*.txt`）允许放在服务外的指定目录，其余（组件库注册表 `sources.json`、索引生成逻辑 `rebuild_index.js`、`search_index.json`）都内置在本服务里、随服务一起维护。
+
+完整链路：
 
 ```
-①拆解 .pix              ②登记到 SOURCES         ③重新生成索引            ④同步到 component-service
-pix-split/split_compset  pix-split/enrich/        merge_index.js           复制 search_index.json
-   → lib-out/{source}/   merge_index.js              ↓                      （及 lib-out 数据，若路径不同）
-                              SOURCES.push(...)    build_index.js              ↓
-                                                      ↓                     重启服务，验证 hex_keys 增量
-                                                  search_index.json
+① POST /split (source=xxx)   ② POST /sources              ③ POST /rebuild-index
+拆解 .pix 落盘到                登记 {key,label} 到            读取各 source 的 component_index.json
+LIB_OUT_DIR/{source}/           本服务的 sources.json          → 合并 → 重写 search_index.json
+component/                                                    → 热重载 hexPathMap + 匹配缓存
+                                                                  ↓
+                                                            无需重启，立即生效
 ```
 
 ### 第 ① 步：拆解组件库，产出 `component/` 目录
 
-有两种等价方式，二选一：
-
-**方式 A — CLI（直接产出到 `lib-out/`，推荐用于本机批量处理）**
-
-使用 `pixso-parse/pix-split/` 下的 `split_compset` 工具（详见 [pix-split/README.md](../../pixso-parse/pix-split/README.md)）：
+直接调用本服务自带的 [`POST /split`](#post-split)，传 `source` 参数让拆解结果直接落盘到 `LIB_OUT_DIR/{source}/component/`，免去手动解压挪动：
 
 ```bash
-cd pixso-parse/pix-split
-./bin/split_compset build_index \
-  "<新组件库>.pix" \
-  lib-out/<新库目录名> \
-  --publish-file <publish-id>
+curl -s -X POST http://localhost:3102/split \
+  -F "file=@<新组件库>.pix" \
+  -F "publishFile=<publish-id>" \
+  -F "source=<新库目录名>"
 ```
 
-**方式 B — `POST /split` 接口（适合远程/无 shell 访问场景，本服务自带）**
-
-`component-service` 内置了基于同一套 WASM（`split_compset_wasm.cpp` 编译产物）的拆解接口，详见下方[「POST /split」](#post-split)。它接收上传的 `.pix` 文件拆解后：
-- 不传 `source` 参数：把 `component/` 目录打包成 zip 返回，拿到 zip 后解压到 `lib-out/<新库目录名>/` 即可，效果与方式 A 完全一致；
-- 传 `source` 参数（新库目录名）：跳过打包，直接把拆解结果写入 `LIB_OUT_DIR/{source}/component/`，免去手动解压挪动这一步（若目标目录已存在会报错，不会覆盖）。
-
-示例（不传 `source`，走 zip 流程）：
-
-```bash
-curl -s -X POST http://localhost:3102/split -F "file=@<新组件库>.pix" -F "publishFile=<publish-id>" \
-  | jq -r '.zip' | base64 -d > output.zip
-
-unzip output.zip -d pixso-parse/pix-split/lib-out/<新库目录名>
-```
-
-两种方式产出的目录结构应为：
+产出的目录结构：
 
 ```
-lib-out/<新库目录名>/
+{LIB_OUT_DIR}/<新库目录名>/
 └── component/
     ├── component_index.json   # 必须：记录该库所有组件集/独立组件及其 hexFile 路径
     ├── {componentKey 或 sessionId_localId}.txt
     └── ...
 ```
 
-> **目录名（即 `source` key）建议直接用新库名的 kebab-case**，因为这个名字会贯穿后续所有步骤——它既是 `lib-out/` 下的子目录名，也是 `merge_index.js` 里 `SOURCES` 的 `key`，还是 `search_index.json` 里每条 entry 的 `source` 字段。三者必须保持完全一致，否则 `component-service` 启动时拼出来的路径会找不到文件。
+> **`<新库目录名>` 即后续的 `source` key，建议直接用新库名的 kebab-case**——它既是 `LIB_OUT_DIR/` 下的子目录名，也是 `sources.json` 里的 `key`，还是 `search_index.json` 里每条 entry 的 `source` 字段。三者必须完全一致，否则拼出来的路径会找不到文件。
+>
+> 没有 shell 访问权限跑 CLI 也没关系——`/split` 走 HTTP 即可完成这一步；CLI 方式（`pix-split/bin/split_compset build_index ...`）仍然可用，但产物落到 `LIB_OUT_DIR` 后，下面 ②③ 两步同样要走本服务的接口才能接入。
 
-> ⚠️ **当前已存在但尚未接入的真实例子**：`lib-out/h-design-dark/` 目录已经拆解完成（含 `component_index.json`），但**尚未**出现在 `merge_index.js` 的 `SOURCES` 列表里，因此目前查不到、也匹配不到这个库里的组件——这正是本节要解决的"半成品"状态。
+### 第 ② 步：登记到 `sources.json`
 
-### 第 ② 步：登记到 `merge_index.js` 的 `SOURCES`
+调用 [`POST /sources`](#post-sources) 把新库注册进本服务的组件库列表（持久化在 `nodejs/component-service/sources.json`，服务重启后依然有效）：
 
-编辑 `pixso-parse/pix-split/enrich/merge_index.js`：
-
-```js
-const SOURCES = [
-  { key: 'h-design-light', label: 'H Design 浅色样式库' },
-  { key: 'h-design-chart', label: 'H Design 图表库'     },
-  { key: 'ict-ui',         label: 'ICT UI 组件库'        },
-  { key: 'h-design-dark',  label: 'H Design 深色样式库'  },   // ← 新增一行
-];
+```bash
+curl -s -X POST http://localhost:3102/sources \
+  -H "Content-Type: application/json" \
+  -d '{ "key": "<新库目录名>", "label": "<展示用中文名>" }'
 ```
 
-- `key`：必须与 `lib-out/` 下的子目录名**完全一致**（决定运行时路径拼接是否正确）
+- `key`：必须与 `LIB_OUT_DIR/` 下的子目录名**完全一致**（决定运行时路径拼接是否正确），格式同 `/split` 的 `source`（字母/数字/`-`/`_`，不允许路径分隔符）
 - `label`：展示用的中文名，会出现在 `/match` 等接口返回结果的 `sourceLabel` 字段里
+- 重复注册同一个 `key` 会返回 409
 
-### 第 ③ 步：重新生成 `search_index.json`
+> 用 [`GET /sources`](#get-sources) 随时查看当前已注册的组件库列表。
 
-```bash
-cd pixso-parse/pix-split/enrich
-node merge_index.js   # 重新读取 lib-out/{每个 source}/component/component_index.json → 写 merged.json
-node build_index.js   # 基于 merged.json 生成最终的 search_index.json（含 searchText 检索字段）
-```
+### 第 ③ 步：重新生成索引并热重载
 
-执行完后留意终端输出的 entry 数量是否符合预期增量（新库贡献了多少个 componentSets / standaloneComponents）。
-
-### 第 ④ 步：同步到 `component-service`
-
-`component-service` 里的 `search_index.json` 是**独立复制**的一份（不是软链接，也不会自动跟 `enrich/` 同步），需要手动覆盖：
+调用 [`POST /rebuild-index`](#post-rebuild-index)，一步完成「读取 `sources.json` 中每个库的 `component_index.json` → 合并打标 → 重写 `search_index.json` → 重建 `hexPathMap` → 清空匹配缓存」，**无需重启服务**：
 
 ```bash
-cp pixso-parse/pix-split/enrich/search_index.json nodejs/component-service/search_index.json
+curl -s -X POST http://localhost:3102/rebuild-index
 ```
 
-另外要确认 `component-service` 的 `LIB_OUT_DIR` 能访问到新库的 hex 文件：
-- **本地/同机部署**：默认 `LIB_OUT_DIR` 指向 `pixso-parse/pix-split/lib-out`（与 `enrich` 共用同一份数据），新库目录已经在第①步落到这里了，无需额外操作
-- **跨机器部署**（参见 [MIGRATION.md](../MIGRATION.md)）：需要把新增的 `lib-out/{新库目录名}/` 一并同步到目标机器上 `LIB_OUT_DIR` 指向的路径下
+返回结果里 `sources` 数组按 `sources.json` 顺序列出每个库贡献的 `componentSets`/`standaloneComponents` 数量（找不到 `component_index.json` 的库会标 `skipped: true` 并附原因），`entries`/`hex_keys` 是合并后的总数，可与接入前的 `/health` 做对比确认增量符合预期。
 
-### 第 ⑤ 步：重启并验证
-
-```bash
-cd nodejs/component-service
-node server.js
-```
+### 第 ④ 步：验证
 
 ```bash
 # 1. 确认 hex_keys 总数比接入前增加了（增量应等于新库贡献的 entry 数）
@@ -172,14 +137,23 @@ curl -s -X POST http://localhost:3102/match -H "Content-Type: application/json" 
   -d '{ "description": "<新库中某组件的典型描述>" }'
 ```
 
+### 刷新已有组件库（库内容有更新但 `source` 不变）
+
+重新走第①步把新的 `component/` 落到同一个 `source` 目录下（注意 `/split` 不会覆盖已存在目录，需先清理旧数据），`sources.json` 无需改动，直接调用 `POST /rebuild-index` 重新生成索引并热重载即可。
+
+### 跨机器部署时的 hex 静态资源同步
+
+`LIB_OUT_DIR` 是本服务里**唯一**允许指向外部路径的部分（其余如 `sources.json`、`search_index.json` 都在服务目录内、随服务一起部署）。跨机器部署时（参见 [MIGRATION.md](../MIGRATION.md)），需要把新增的 `LIB_OUT_DIR/{新库目录名}/` 一并同步到目标机器上 `LIB_OUT_DIR` 指向的路径下；本地/同机部署默认 `LIB_OUT_DIR` 指向 `pixso-parse/pix-split/lib-out`，第①步的产物已经落在这里，无需额外操作。
+
 ### 排错提示
 
 | 现象 | 原因 |
 |---|---|
-| `/health` 的 `hex_keys` 没有增加 | `search_index.json` 没有重新生成或没有同步覆盖到 `component-service/` |
-| `/hex/:key` 对新库的 key 返回 404 | `merge_index.js` 里 `SOURCES` 的 `key` 与 `lib-out/` 下实际目录名不一致，导致拼出的路径错误；或新库数据未落到 `LIB_OUT_DIR` 指向的目录下 |
-| `/match` 匹配结果里出现新库但 `sourceLabel` 显示异常/缺失 | `SOURCES` 里 `label` 字段写错或漏写 |
-| `key 冲突` / 同一个 key 映射到了错误的文件 | 极小概率事件（新库与已有库的 hex 文件名恰好相同），需要检查 `hexPathMap` 构建逻辑（[server.js:29-37](server.js#L29-L37)）按何种顺序覆盖，必要时改用 `source:key` 复合 key |
+| `/rebuild-index` 返回的 `sources` 里某库 `skipped: true` | 该 `key` 对应的 `LIB_OUT_DIR/{key}/component/component_index.json` 不存在——检查 `/split` 的 `source` 是否与 `sources.json` 里的 `key` 完全一致，或新库数据是否已落到 `LIB_OUT_DIR` |
+| `/health` 的 `hex_keys` 没有增加 | 没有调用 `POST /rebuild-index`，或调用后 `sources` 里对应库被 `skipped` |
+| `/hex/:key` 对新库的 key 返回 404 | `sources.json` 里的 `key` 与 `LIB_OUT_DIR/` 下实际目录名不一致，导致拼出的路径错误 |
+| `/match` 匹配结果里出现新库但 `sourceLabel` 显示异常/缺失 | `POST /sources` 注册时 `label` 字段写错或漏写——可重新 `POST /sources` 用正确的 `label`（先在 `sources.json` 里删掉旧条目）后再 `rebuild-index` |
+| `key 冲突` / 同一个 key 映射到了错误的文件 | 极小概率事件（新库与已有库的 hex 文件名恰好相同），需要检查 `hexPathMap` 构建逻辑（[server.js](server.js)）按何种顺序覆盖，必要时改用 `source:key` 复合 key |
 
 ---
 
@@ -195,6 +169,89 @@ curl -s -X POST http://localhost:3102/match -H "Content-Type: application/json" 
 ```
 
 `hex_keys` 为已加载的 hex key 映射条数。
+
+---
+
+### GET /sources
+
+查看当前已注册的组件库列表（即 `sources.json` 内容，决定 `/rebuild-index` 会处理哪些库）。
+
+**响应 200：**
+```json
+{
+  "sources": [
+    { "key": "h-design-light", "label": "H Design 浅色样式库" },
+    { "key": "h-design-chart", "label": "H Design 图表库" },
+    { "key": "ict-ui",         "label": "ICT UI 组件库" }
+  ]
+}
+```
+
+---
+
+### POST /sources
+
+注册一个新组件库（持久化写入 `sources.json`，供 `/rebuild-index` 使用）。这是「[新增组件库全流程](#新增组件库全程在-component-service-内完成)」的第②步。
+
+**请求体：**
+
+| 字段 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `key` | string | 是 | 组件库目录名，须与 `LIB_OUT_DIR/{key}/component/` 实际目录名完全一致；只能包含字母/数字/`-`/`_`，不允许路径分隔符 |
+| `label` | string | 是 | 展示用中文名，会出现在匹配结果的 `sourceLabel` 字段里 |
+
+```json
+{ "key": "h-design-dark", "label": "H Design 深色样式库" }
+```
+
+**响应 200：** 返回注册后的完整列表
+```json
+{ "sources": [ { "key": "...", "label": "..." }, ... ] }
+```
+
+**响应 400 — `key`/`label` 缺失或 `key` 格式不合法：**
+```json
+{ "error": "key must be a simple directory name (letters/digits/-/_, no path separators), matching the lib-out/ subdirectory" }
+{ "error": "label is required" }
+```
+
+**响应 409 — `key` 已注册：**
+```json
+{ "error": "source already registered: ict-ui" }
+```
+
+> 仅登记到列表，**不会**触发索引重建——注册后还需调用 `POST /rebuild-index` 才能让新库真正可被 `/match`、`/hex` 用到。
+
+---
+
+### POST /rebuild-index
+
+基于 `sources.json` 中登记的组件库列表，重新读取各自的 `component_index.json` 并合并生成 `search_index.json`，然后**热重载** `hexPathMap` 与匹配缓存——全程无需重启服务。这是「[新增组件库全流程](#新增组件库全程在-component-service-内完成)」的第③步。
+
+**请求体：** 无
+
+**响应 200：**
+```json
+{
+  "entries": 653,
+  "sources": [
+    { "key": "h-design-light", "label": "H Design 浅色样式库", "componentSets": 0,   "standaloneComponents": 1 },
+    { "key": "h-design-chart", "label": "H Design 图表库",     "componentSets": 149, "standaloneComponents": 12 },
+    { "key": "ict-ui",         "label": "ICT UI 组件库",        "componentSets": 319, "standaloneComponents": 172 },
+    { "key": "h-design-dark",  "label": "H Design 深色样式库",  "skipped": true, "reason": "not found: .../lib-out/h-design-dark/component/component_index.json" }
+  ],
+  "hex_keys": 653
+}
+```
+
+`entries`/`hex_keys` 为重建后 `search_index.json` 的总条目数与热重载后的 hex key 映射条数；`sources` 按 `sources.json` 顺序逐一报告每个库贡献的 `componentSets`/`standaloneComponents` 数量，找不到 `component_index.json` 的库会标 `skipped: true` 并附 `reason`（不会中断整个重建过程）。
+
+**响应 500 — 重建失败**（如 `LIB_OUT_DIR` 不可读）：
+```json
+{ "error": "..." }
+```
+
+> 调用前后对比 `GET /health` 的 `hex_keys`，可确认新库是否成功接入及增量是否符合预期。
 
 ---
 
@@ -312,7 +369,7 @@ curl -X POST http://localhost:3102/match-dsl -H "Content-Type: application/json"
 
 上传 `.pix` 组件库文件，调用 `split_compset` WASM（编译自 [pix-split/split_compset_wasm.cpp](../../pixso-parse/pix-split/split_compset_wasm.cpp)，与 CLI `split_compset build_index` 同源同逻辑）拆解为 `{componentKey 或 sessionId_localId}.txt` + `component_index.json`。
 
-这是「[新增组件库全流程](#新增组件库从拆解到接入服务全流程)」的第①步——**拆解只是第一步，产物要真正可被 `/match`、`/hex` 用到，还需要继续走完登记 SOURCES → 重新生成索引 → 同步 → 重启验证**。
+这是「[新增组件库全流程](#新增组件库全程在-component-service-内完成)」的第①步——**拆解只是第一步，产物要真正可被 `/match`、`/hex` 用到，还需要继续走完注册 sources → 重新生成索引 → 验证（见下方全流程）**。
 
 **请求方式：** `multipart/form-data`
 
@@ -397,13 +454,13 @@ curl -X POST http://localhost:3102/split \
 
 > 实测验证：上传一个含 1 个组件集（2 个变体）的真实 `.pix` 文件，不传 `source` 时返回 `{"total":1,"componentSets":1,"standaloneComponents":0,...}` + zip，解压得到 `component/component_index.json` + `component/2_105.txt`，内容与 CLI 拆解结果一致；上传非 `.pix` 文件返回 `{"error":"parse failed: <原始文件名>"}`（已对临时路径做了脱敏，不会泄露服务器目录结构）。
 
-> ⚠️ 上传体积限制 200MB（`.pix` 库文件可能较大）；无论哪种方式，本接口只完成"拆解落盘"，**不会**自动更新 `search_index.json`，仍需按上方全流程继续登记 SOURCES → 重新生成索引 → 重启验证，避免未经检查就让新数据生效。
+> ⚠️ 上传体积限制 200MB（`.pix` 库文件可能较大）；无论哪种方式，本接口只完成"拆解落盘"，**不会**自动更新 `search_index.json`，仍需按上方全流程继续 `POST /sources` 注册 → `POST /rebuild-index` 重建索引并热重载，避免未经检查就让新数据生效。
 
 ---
 
 ### GET /hex/:key
 
-跨组件库查找并返回指定 key 对应的 hex 文件内容（供 dsl-to-hex 等服务调用）。
+跨组件库查找并返回指定 key 对应的 hex 文件内容（供其他服务调用）。
 
 **路径参数：** `key` —
 - 40 位小写 hex 字符串（旧版 SHA1 componentKey，如 `ict-ui` 库）
@@ -423,14 +480,14 @@ curl -X POST http://localhost:3102/split \
 
 ---
 
-## 与原服务的差异说明
+## 核心能力一览
 
-| | 原 component-query | 本服务 |
+| 能力 | 接口 | 说明 |
 |---|---|---|
-| 组件查询 | 字符串模糊匹配（`POST /query`，已停用） | LLM 语义匹配（`/match`、`/batch`、`/match-dsl`） |
-| hex 获取范围 | 单一 `COMPONENT_DIR`（仅 ict-ui） | 跨 `ict-ui` / `h-design-chart` / `h-design-light` 三库统一查找 |
-| hex 定位方式 | `path.join(COMPONENT_DIR, key + '.txt')` 直接拼路径 | 启动时基于 `search_index.json` 构建 `key → 绝对路径` 映射 |
-| 组件库拆解 | 无 | `POST /split` —— 上传 `.pix` 直接拆解打包返回，免去手动跑 CLI |
+| 组件查询 | `/match`、`/batch`、`/match-dsl` | LLM 语义匹配，支持单条 / 批量 / 从 DSL 节点树自动提取匹配 |
+| hex 获取 | `/hex/:key` | 跨 `ict-ui` / `h-design-chart` / `h-design-light` 等多组件库统一查找，调用方无需关心组件来自哪个库 |
+| 组件库拆解 | `/split` | 上传 `.pix` 直接拆解（基于 WASM），可选直接落盘到 `LIB_OUT_DIR/{source}/` |
+| 组件库管理 | `/sources`、`/rebuild-index` | 注册新组件库、重建索引并热重载——见上方[「新增组件库」](#新增组件库全程在-component-service-内完成)一节 |
 
 ---
 

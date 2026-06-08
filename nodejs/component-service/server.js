@@ -5,16 +5,30 @@ const fs                = require('fs');
 const path              = require('path');
 const express           = require('express');
 const multer            = require('multer');
-const { matchVariant }  = require('./match_variant');
-const { matchVariants } = require('./batch_match');
-const { matchDsl }      = require('./match_dsl');
-const { splitLibrary }  = require('./split_lib');
+const { matchVariant, clearIndexCache } = require('./match_variant');
+const { matchVariants }  = require('./batch_match');
+const { matchDsl }       = require('./match_dsl');
+const { splitLibrary }   = require('./split_lib');
+const { loadSources, saveSources, rebuildIndex } = require('./rebuild_index');
+
+// 加载同目录 .env：让 PORT / LIB_OUT_DIR 等配置写在配置文件里而不必每次启动手动传环境变量，
+// 显式传入的环境变量优先级更高（不会被 .env 覆盖）
+const envFile = path.resolve(__dirname, '.env');
+if (fs.existsSync(envFile)) {
+  fs.readFileSync(envFile, 'utf8').split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const [k, v] = trimmed.split('=');
+    if (k && v && !process.env[k.trim()]) process.env[k.trim()] = v.trim();
+  });
+}
 
 const app    = express();
 const PORT   = Number(process.env.PORT) || 3102;
 const upload = multer({ storage: multer.memoryStorage() });
 
 // 多组件库根目录：search_index.json 中每个 entry 的 hexFile 是相对 lib-out/{source}/ 的路径
+// 优先读取环境变量 / .env 中的 LIB_OUT_DIR，未配置时退回默认相对路径
 const LIB_OUT_DIR = process.env.LIB_OUT_DIR
   || path.resolve(__dirname, '../../pixso-parse/pix-split/lib-out');
 
@@ -29,6 +43,7 @@ const hexPathMap = new Map();
 
 function buildHexPathMap() {
   const { entries } = JSON.parse(fs.readFileSync(SEARCH_INDEX_PATH, 'utf8'));
+  hexPathMap.clear();
   for (const entry of entries) {
     if (!entry.hexFile || !entry.source) continue;
     const key = path.basename(entry.hexFile, path.extname(entry.hexFile));
@@ -45,10 +60,58 @@ console.log(`hex 索引加载成功: ${loadedCount} 个 key（来源: ${SEARCH_I
 //   新格式：{sessionId}_{localId}（从 guid 派生）
 const KEY_RE = /^([a-f0-9]{40}|\d+_\d+)$/;
 
+// source / sources[].key 即 lib-out/ 下的目录名，限制为简单目录名，禁止路径分隔符与 .. 防止路径穿越
+const SOURCE_DIR_RE = /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/;
+
 // ── GET /health ───────────────────────────────────────────────────────────────
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', hex_keys: hexPathMap.size });
+});
+
+// ── /sources ──────────────────────────────────────────────────────────────────
+// 组件库注册表，存于本服务的 sources.json。
+// key 必须与 LIB_OUT_DIR 下的子目录名完全一致，否则 rebuild-index 会跳过该库。
+
+app.get('/sources', (req, res) => {
+  res.json({ sources: loadSources() });
+});
+
+app.post('/sources', (req, res) => {
+  const key   = typeof req.body?.key === 'string' ? req.body.key.trim() : '';
+  const label = typeof req.body?.label === 'string' ? req.body.label.trim() : '';
+
+  if (!key || !SOURCE_DIR_RE.test(key)) {
+    return res.status(400).json({ error: 'key must be a simple directory name (letters/digits/-/_, no path separators), matching the lib-out/ subdirectory' });
+  }
+  if (!label) {
+    return res.status(400).json({ error: 'label is required' });
+  }
+
+  const sources = loadSources();
+  if (sources.some(s => s.key === key)) {
+    return res.status(409).json({ error: `source already registered: ${key}` });
+  }
+
+  sources.push({ key, label });
+  saveSources(sources);
+  res.json({ sources });
+});
+
+// ── POST /rebuild-index ───────────────────────────────────────────────────────
+// 基于 sources.json 登记的组件库，重新读取各自的 component_index.json 并合并生成
+// search_index.json，然后热重载 hexPathMap 与 match_variant 的索引缓存——
+// 全程在本服务内完成，重建后立即热生效，无需重启。
+
+app.post('/rebuild-index', (req, res) => {
+  try {
+    const result = rebuildIndex(LIB_OUT_DIR);
+    const hexKeys = buildHexPathMap();
+    clearIndexCache();
+    res.json({ ...result, hex_keys: hexKeys });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // description 应为简短自然语言描述（如"主按钮大号"），不能是序列化的 JSON 对象/数组——
@@ -178,9 +241,6 @@ app.post('/match-dsl', upload.single('file'), async (req, res) => {
 
 const SPLIT_UPLOAD_LIMIT = 200 * 1024 * 1024; // 200MB，.pix 库文件可能较大
 const splitUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: SPLIT_UPLOAD_LIMIT } });
-
-// source 即 lib-out/ 下的目录名，限制为简单目录名，禁止路径分隔符与 .. 防止路径穿越
-const SOURCE_DIR_RE = /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/;
 
 app.post('/split', splitUpload.single('file'), async (req, res) => {
   if (!req.file) {

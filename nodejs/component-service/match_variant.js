@@ -27,6 +27,11 @@ function loadIndex() {
   return _index;
 }
 
+// rebuild_index 重新生成 search_index.json 后调用，使下次匹配重新读盘而非用旧缓存
+function clearIndexCache() {
+  _index = null;
+}
+
 // ── 第一步：LLM 语义提取 → 中文搜索关键词 ────────────────────────────────────
 
 async function normalizeQuery(description) {
@@ -219,4 +224,4 @@ if (require.main === module) {
     .catch(err => { console.error(err.message); process.exit(1); });
 }
 
-module.exports = { matchVariant };
+module.exports = { matchVariant, clearIndexCache };
