@@ -7,7 +7,7 @@ const express           = require('express');
 const multer            = require('multer');
 const { matchVariant, clearIndexCache } = require('./match_variant');
 const { matchVariants }  = require('./batch_match');
-const { matchDsl }       = require('./match_dsl');
+const { matchDsl, matchDslSingle } = require('./match_dsl');
 const { splitLibrary }   = require('./split_lib');
 const { loadSources, saveSources, rebuildIndex } = require('./rebuild_index');
 
@@ -34,12 +34,33 @@ const LIB_OUT_DIR = process.env.LIB_OUT_DIR
 
 app.use(express.json());
 
-// 统一打印接口异常：/match 等接口报错时仅把 err.message 透传给调用方，
-// 不打日志的话出现 timeout 等问题完全无从排查——这里在响应前先落一条 server 端日志，
-// 带上时间戳、接口路径与简要请求信息，方便对照 match_variant 里的 LLM 调用日志定位卡在哪一步
-function logRouteError(label, err, extra) {
+// 统一打印接口异常/非 2xx 响应：调用方只能看到响应体里的 { error }，看不到时间戳、
+// 请求参数、是哪一步触发的——出问题时只能在调用方那一侧干瞪眼。这里在响应前统一落一条
+// server 端日志（4xx 用 warn，5xx 用 error），带上时间戳、接口路径、简要请求信息和
+// 失败原因，方便对照 match_variant 里逐步的 LLM 调用日志，串起"请求进来 → 卡在哪一步
+// → 返回了什么"的完整链路
+function logRouteResponse(label, status, message, extra) {
   const extraStr = extra ? ` (${extra})` : '';
-  console.error(`[${new Date().toISOString()}] ${label}${extraStr} 失败：${err.message}`);
+  const line = `[${new Date().toISOString()}] ${label}${extraStr} 返回 ${status}：${message}`;
+  if (status >= 500) console.error(line);
+  else console.warn(line);
+}
+
+// 4xx/5xx 统一走这里发响应：日志和响应体一次性落地，不会出现"光记日志却忘了统一格式"
+// 或者"响应了却没留痕迹"的不一致。payload 通常是 { error, ... }，日志里取 error 字段展示
+function sendError(res, label, status, payload, extra) {
+  const message = (payload && typeof payload === 'object' && 'error' in payload)
+    ? payload.error
+    : JSON.stringify(payload);
+  logRouteResponse(label, status, message, extra);
+  return res.status(status).json(payload);
+}
+
+// 进入每个接口时打一条"收到请求"日志，带上能帮助定位的关键参数——
+// 这样从日志就能看出"请求到了没有 / 参数是什么 / 是卡住了还是根本没收到请求"
+function logRouteEnter(label, extra) {
+  const extraStr = extra ? ` (${extra})` : '';
+  console.log(`[${new Date().toISOString()}] ${label}${extraStr} 收到请求`);
 }
 
 // ---------------------------------------------------------------------------
@@ -88,17 +109,18 @@ app.get('/sources', (req, res) => {
 app.post('/sources', (req, res) => {
   const key   = typeof req.body?.key === 'string' ? req.body.key.trim() : '';
   const label = typeof req.body?.label === 'string' ? req.body.label.trim() : '';
+  logRouteEnter('POST /sources', `key="${key}", label="${label}"`);
 
   if (!key || !SOURCE_DIR_RE.test(key)) {
-    return res.status(400).json({ error: 'key must be a simple directory name (letters/digits/-/_, no path separators), matching the lib-out/ subdirectory' });
+    return sendError(res, 'POST /sources', 400, { error: 'key must be a simple directory name (letters/digits/-/_, no path separators), matching the lib-out/ subdirectory' }, `key="${key}"`);
   }
   if (!label) {
-    return res.status(400).json({ error: 'label is required' });
+    return sendError(res, 'POST /sources', 400, { error: 'label is required' }, `key="${key}"`);
   }
 
   const sources = loadSources();
   if (sources.some(s => s.key === key)) {
-    return res.status(409).json({ error: `source already registered: ${key}` });
+    return sendError(res, 'POST /sources', 409, { error: `source already registered: ${key}` });
   }
 
   sources.push({ key, label });
@@ -112,14 +134,17 @@ app.post('/sources', (req, res) => {
 // 全程在本服务内完成，重建后立即热生效，无需重启。
 
 app.post('/rebuild-index', (req, res) => {
+  logRouteEnter('POST /rebuild-index');
   try {
+    console.log('[server] /rebuild-index → 开始读取 sources.json 并重新生成 search_index.json');
     const result = rebuildIndex(LIB_OUT_DIR);
+    console.log(`[server] /rebuild-index → 索引已重写，开始重建 hexPathMap 并清空匹配缓存（entries=${result.entries}）`);
     const hexKeys = buildHexPathMap();
     clearIndexCache();
+    console.log(`[server] /rebuild-index ✓ 完成：hex_keys=${hexKeys}`);
     res.json({ ...result, hex_keys: hexKeys });
   } catch (err) {
-    logRouteError('POST /rebuild-index', err);
-    res.status(500).json({ error: err.message });
+    sendError(res, 'POST /rebuild-index', 500, { error: err.message });
   }
 });
 
@@ -158,17 +183,21 @@ function checkDescription(desc) {
 
 app.post('/match', async (req, res) => {
   const { description } = req.body || {};
+  const descLog = `description=${JSON.stringify(description)}`;
+  logRouteEnter('POST /match', descLog);
+
   const descErr = checkDescription(description);
   if (descErr) {
-    return res.status(400).json({ error: descErr });
+    return sendError(res, 'POST /match', 400, { error: descErr }, descLog);
   }
+  const trimmed = description.trim();
   try {
-    const result = await matchVariant(description.trim());
-    if (!result) return res.status(404).json({ error: 'no match found' });
+    const result = await matchVariant(trimmed);
+    if (!result) return sendError(res, 'POST /match', 404, { error: 'no match found' }, `description="${trimmed}"`);
+    console.log(`[server] POST /match (description="${trimmed}") ✓ 命中：${result.componentSetName} / ${result.variant?.name || '(standalone)'}`);
     res.json(result);
   } catch (err) {
-    logRouteError('POST /match', err, `description="${description.trim()}"`);
-    res.status(500).json({ error: err.message });
+    sendError(res, 'POST /match', 500, { error: err.message }, `description="${trimmed}"`);
   }
 });
 
@@ -177,20 +206,21 @@ app.post('/match', async (req, res) => {
 app.post('/batch', async (req, res) => {
   const body = req.body;
   let descriptions;
+  logRouteEnter('POST /batch', `body 类型=${Array.isArray(body) ? 'array' : typeof body}`);
 
   if (Array.isArray(body)) {
     descriptions = body.map(x => (typeof x === 'string' ? x : x.description));
   } else if (Array.isArray(body?.descriptions)) {
     descriptions = body.descriptions;
   } else {
-    return res.status(400).json({ error: 'body must be an array or { descriptions: [] }' });
+    return sendError(res, 'POST /batch', 400, { error: 'body must be an array or { descriptions: [] }' });
   }
 
   if (descriptions.length === 0) {
-    return res.status(400).json({ error: 'descriptions array is empty' });
+    return sendError(res, 'POST /batch', 400, { error: 'descriptions array is empty' });
   }
   if (descriptions.length > 100) {
-    return res.status(400).json({ error: 'max 100 descriptions per request' });
+    return sendError(res, 'POST /batch', 400, { error: 'max 100 descriptions per request' }, `实际 ${descriptions.length} 条`);
   }
 
   const invalid = [];
@@ -199,44 +229,79 @@ app.post('/batch', async (req, res) => {
     if (err) invalid.push({ index: i, error: err });
   });
   if (invalid.length > 0) {
-    return res.status(400).json({ error: 'invalid descriptions', details: invalid });
+    return sendError(res, 'POST /batch', 400, { error: 'invalid descriptions', details: invalid }, `${invalid.length}/${descriptions.length} 条不合法`);
   }
 
+  console.log(`[server] POST /batch → 开始批量匹配 ${descriptions.length} 条描述（内部 5 并发）`);
   try {
     const results = await matchVariants(descriptions.map(d => d?.trim?.() ?? d));
+    const hit = results.filter(r => r && !r.error).length;
+    console.log(`[server] POST /batch ✓ 完成：${descriptions.length} 条中 ${hit} 条命中`);
     res.json(results);
   } catch (err) {
-    logRouteError('POST /batch', err, `${descriptions.length} 条描述`);
-    res.status(500).json({ error: err.message });
+    sendError(res, 'POST /batch', 500, { error: err.message }, `${descriptions.length} 条描述`);
   }
 });
 
-// ── POST /match-dsl ───────────────────────────────────────────────────────────
+// ── POST /match-dsl 与 /match-dsl-single 共用：解析 multipart / JSON 两种请求体 ──
 // 支持两种方式：
 //   1. multipart 文件上传：-F "file=@page.json"
 //   2. JSON body：-H "Content-Type: application/json" -d '{...}'
 
-app.post('/match-dsl', upload.single('file'), async (req, res) => {
-  let nodeData;
-
+function readDslRequestBody(req, res, label) {
   if (req.file) {
+    console.log(`[server] ${label} → multipart 文件上传：${req.file.originalname}（${req.file.size} 字节）`);
     try {
-      nodeData = JSON.parse(req.file.buffer.toString('utf8'));
+      return JSON.parse(req.file.buffer.toString('utf8'));
     } catch {
-      return res.status(400).json({ error: 'uploaded file is not valid JSON' });
+      sendError(res, label, 400, { error: 'uploaded file is not valid JSON' }, req.file.originalname);
+      return undefined;
     }
-  } else if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
-    nodeData = req.body;
-  } else {
-    return res.status(400).json({ error: 'send a file via -F "file=@page.json" or a JSON body' });
   }
+  if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
+    console.log(`[server] ${label} → JSON body，根节点 keys=[${Object.keys(req.body).join(', ')}]`);
+    return req.body;
+  }
+  sendError(res, label, 400, { error: 'send a file via -F "file=@page.json" or a JSON body' });
+  return undefined;
+}
+
+// ── POST /match-dsl ───────────────────────────────────────────────────────────
+// 整页统一匹配：本页所有实例合并成一次 LLM 裁决，看到全局上下文后统一选择，
+// 同语义的多个实例（如多个"确定按钮"）会得到一致的组件集/变体
+
+app.post('/match-dsl', upload.single('file'), async (req, res) => {
+  logRouteEnter('POST /match-dsl');
+  const nodeData = readDslRequestBody(req, res, 'POST /match-dsl');
+  if (nodeData === undefined) return;
 
   try {
     const results = await matchDsl(nodeData);
+    const hit = results.filter(r => r.match).length;
+    console.log(`[server] POST /match-dsl ✓ 完成：提取到 ${results.length} 个可匹配节点，命中 ${hit} 个`);
     res.json(results);
   } catch (err) {
-    logRouteError('POST /match-dsl', err);
-    res.status(500).json({ error: err.message });
+    sendError(res, 'POST /match-dsl', 500, { error: err.message });
+  }
+});
+
+// ── POST /match-dsl-single ────────────────────────────────────────────────────
+// 逐节点独立匹配（旧版行为）：每个实例各自跑一遍完整匹配流程，互不知情，
+// 可能导致同语义的多个实例被分别选到不一致的组件集/变体；
+// 保留供对照旧行为或排查问题时使用，新接入建议直接用 /match-dsl
+
+app.post('/match-dsl-single', upload.single('file'), async (req, res) => {
+  logRouteEnter('POST /match-dsl-single');
+  const nodeData = readDslRequestBody(req, res, 'POST /match-dsl-single');
+  if (nodeData === undefined) return;
+
+  try {
+    const results = await matchDslSingle(nodeData);
+    const hit = results.filter(r => r.match).length;
+    console.log(`[server] POST /match-dsl-single ✓ 完成：提取到 ${results.length} 个可匹配节点，命中 ${hit} 个`);
+    res.json(results);
+  } catch (err) {
+    sendError(res, 'POST /match-dsl-single', 500, { error: err.message });
   }
 });
 
@@ -256,13 +321,16 @@ const splitUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize
 
 app.post('/split', splitUpload.single('file'), async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: 'send a .pix file via -F "file=@library.pix"' });
+    logRouteEnter('POST /split');
+    return sendError(res, 'POST /split', 400, { error: 'send a .pix file via -F "file=@library.pix"' });
   }
 
   const publishFile = typeof req.body?.publishFile === 'string' ? req.body.publishFile.trim() : '';
   const source      = typeof req.body?.source === 'string' ? req.body.source.trim() : '';
+  logRouteEnter('POST /split', `file=${req.file.originalname} (${req.file.size} 字节), source="${source || '(未指定，返回 zip)'}"`);
+
   if (source && !SOURCE_DIR_RE.test(source)) {
-    return res.status(400).json({ error: 'source must be a simple directory name (letters/digits/-/_, no path separators)' });
+    return sendError(res, 'POST /split', 400, { error: 'source must be a simple directory name (letters/digits/-/_, no path separators)' }, `source="${source}"`);
   }
 
   try {
@@ -272,12 +340,13 @@ app.post('/split', splitUpload.single('file'), async (req, res) => {
       opts.saveDir = path.join(LIB_OUT_DIR, source);
     }
 
+    console.log(`[server] POST /split → 调用 split_compset WASM 拆解 ${req.file.originalname}`);
     const result = await splitLibrary(req.file.buffer, opts);
-    if (result.error) return res.status(500).json({ error: result.error });
+    if (result.error) return sendError(res, 'POST /split', 500, { error: result.error }, req.file.originalname);
+    console.log(`[server] POST /split ✓ 完成：${JSON.stringify(result.stats || result)}`);
     res.json(result);
   } catch (err) {
-    logRouteError('POST /split', err, req.file.originalname);
-    res.status(500).json({ error: err.message });
+    sendError(res, 'POST /split', 500, { error: err.message }, req.file.originalname);
   }
 });
 
@@ -287,15 +356,18 @@ app.post('/split', splitUpload.single('file'), async (req, res) => {
 
 app.get('/hex/:key', (req, res) => {
   const { key } = req.params;
+  logRouteEnter('GET /hex/:key', `key="${key}"`);
+
   if (!KEY_RE.test(key)) {
-    return res.status(400).json({ error: 'key must be a 40-char lowercase hex string or {sessionId}_{localId}' });
+    return sendError(res, 'GET /hex/:key', 400, { error: 'key must be a 40-char lowercase hex string or {sessionId}_{localId}' }, `key="${key}"`);
   }
 
   const filePath = hexPathMap.get(key);
   if (!filePath || !fs.existsSync(filePath)) {
-    return res.status(404).json({ error: `component not found: ${key}` });
+    return sendError(res, 'GET /hex/:key', 404, { error: `component not found: ${key}` }, `key="${key}"`);
   }
 
+  console.log(`[server] GET /hex/:key (key="${key}") ✓ 命中：${filePath}`);
   res.set('Content-Type', 'text/plain; charset=utf-8');
   fs.createReadStream(filePath).pipe(res);
 });
