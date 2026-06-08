@@ -167,15 +167,20 @@ app.post('/match-dsl', upload.single('file'), async (req, res) => {
 
 // ── POST /split ───────────────────────────────────────────────────────────────
 // 上传 .pix 组件库文件，调用 split_compset WASM 拆解为
-// {componentKey 或 sessionId_localId}.txt + component_index.json，
-// 打包为 zip 返回（zip 根目录即 component/，可直接解压进 lib-out/{source}/ 使用）。
+// {componentKey 或 sessionId_localId}.txt + component_index.json。
 //
-// 这一步只负责"拆解"，产物要真正接入查询/匹配能力，仍需按
-// API.md「新增组件库」一节继续走：登记 SOURCES → 重新生成 search_index.json →
+// 不传 source：打包为 zip 返回（zip 根目录即 component/，需手动解压进 lib-out/{source}/）。
+// 传了 source：跳过打包，直接把 component/ 写入 LIB_OUT_DIR/{source}/，免去手动解压挪动。
+//
+// 无论哪种方式，这一步都只完成"拆解落盘"，产物要真正接入查询/匹配能力，
+// 仍需按 API.md「新增组件库」一节继续走：登记 SOURCES → 重新生成 search_index.json →
 // 同步到本服务 → 重启验证。
 
 const SPLIT_UPLOAD_LIMIT = 200 * 1024 * 1024; // 200MB，.pix 库文件可能较大
 const splitUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: SPLIT_UPLOAD_LIMIT } });
+
+// source 即 lib-out/ 下的目录名，限制为简单目录名，禁止路径分隔符与 .. 防止路径穿越
+const SOURCE_DIR_RE = /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/;
 
 app.post('/split', splitUpload.single('file'), async (req, res) => {
   if (!req.file) {
@@ -183,12 +188,19 @@ app.post('/split', splitUpload.single('file'), async (req, res) => {
   }
 
   const publishFile = typeof req.body?.publishFile === 'string' ? req.body.publishFile.trim() : '';
+  const source      = typeof req.body?.source === 'string' ? req.body.source.trim() : '';
+  if (source && !SOURCE_DIR_RE.test(source)) {
+    return res.status(400).json({ error: 'source must be a simple directory name (letters/digits/-/_, no path separators)' });
+  }
 
   try {
-    const result = await splitLibrary(req.file.buffer, {
-      originalName: req.file.originalname,
-      publishFile,
-    });
+    const opts = { originalName: req.file.originalname, publishFile };
+    if (source) {
+      opts.source  = source;
+      opts.saveDir = path.join(LIB_OUT_DIR, source);
+    }
+
+    const result = await splitLibrary(req.file.buffer, opts);
     if (result.error) return res.status(500).json({ error: result.error });
     res.json(result);
   } catch (err) {

@@ -88,7 +88,11 @@ cd pixso-parse/pix-split
 
 **方式 B — `POST /split` 接口（适合远程/无 shell 访问场景，本服务自带）**
 
-`component-service` 内置了基于同一套 WASM（`split_compset_wasm.cpp` 编译产物）的拆解接口，详见下方[「POST /split」](#post-split)。它接收上传的 `.pix` 文件，拆解后把 `component/` 目录打包成 zip 返回——拿到 zip 后解压到 `lib-out/<新库目录名>/` 即可，效果与方式 A 完全一致：
+`component-service` 内置了基于同一套 WASM（`split_compset_wasm.cpp` 编译产物）的拆解接口，详见下方[「POST /split」](#post-split)。它接收上传的 `.pix` 文件拆解后：
+- 不传 `source` 参数：把 `component/` 目录打包成 zip 返回，拿到 zip 后解压到 `lib-out/<新库目录名>/` 即可，效果与方式 A 完全一致；
+- 传 `source` 参数（新库目录名）：跳过打包，直接把拆解结果写入 `LIB_OUT_DIR/{source}/component/`，免去手动解压挪动这一步（若目标目录已存在会报错，不会覆盖）。
+
+示例（不传 `source`，走 zip 流程）：
 
 ```bash
 curl -s -X POST http://localhost:3102/split -F "file=@<新组件库>.pix" -F "publishFile=<publish-id>" \
@@ -306,7 +310,7 @@ curl -X POST http://localhost:3102/match-dsl -H "Content-Type: application/json"
 
 ### POST /split
 
-上传 `.pix` 组件库文件，调用 `split_compset` WASM（编译自 [pix-split/split_compset_wasm.cpp](../../pixso-parse/pix-split/split_compset_wasm.cpp)，与 CLI `split_compset build_index` 同源同逻辑）拆解为 `{componentKey 或 sessionId_localId}.txt` + `component_index.json`，打包为 zip 返回。
+上传 `.pix` 组件库文件，调用 `split_compset` WASM（编译自 [pix-split/split_compset_wasm.cpp](../../pixso-parse/pix-split/split_compset_wasm.cpp)，与 CLI `split_compset build_index` 同源同逻辑）拆解为 `{componentKey 或 sessionId_localId}.txt` + `component_index.json`。
 
 这是「[新增组件库全流程](#新增组件库从拆解到接入服务全流程)」的第①步——**拆解只是第一步，产物要真正可被 `/match`、`/hex` 用到，还需要继续走完登记 SOURCES → 重新生成索引 → 同步 → 重启验证**。
 
@@ -316,6 +320,9 @@ curl -X POST http://localhost:3102/match-dsl -H "Content-Type: application/json"
 |---|---|---|---|
 | `file` | file | 是 | `.pix` 组件库文件 |
 | `publishFile` | string | 否 | 缺少 `componentKey` 时用于补写发布信息（同 CLI `--publish-file`），生成规则：`componentKey = SHA1(publishFile + sessionID:localID)` |
+| `source` | string | 否 | 新库的目录名（即 `lib-out/` 下的 kebab-case 子目录名，只能包含字母/数字/`-`/`_`，不允许路径分隔符）。**传了此字段时跳过 zip 打包，直接把拆解结果写入 `LIB_OUT_DIR/{source}/component/`**，免去手动解压挪动；不传则维持原行为，返回 zip 由调用方自行解压放置 |
+
+**方式 A — 不传 `source`：返回 zip，自行解压放置**
 
 ```bash
 curl -X POST http://localhost:3102/split \
@@ -349,20 +356,48 @@ component/
 └── ...
 ```
 
-**响应 400 — 未上传文件：**
-```json
-{ "error": "send a .pix file via -F \"file=@library.pix\"" }
+**方式 B — 传 `source`：直接落盘到 `lib-out/{source}/`，跳过 zip**
+
+```bash
+curl -X POST http://localhost:3102/split \
+  -F "file=@library.pix" \
+  -F "publishFile=QcO-1WDViGmGQ4IFU_p4FQ" \
+  -F "source=h-design-new"
 ```
 
-**响应 500 — 拆解失败**（文件不是合法 `.pix`、解析失败、或没有可拆出的组件集）：
+**响应 200：**
+
+```json
+{
+  "stats": {
+    "total": 1,
+    "componentSets": 1,
+    "standaloneComponents": 0,
+    "compDir": "component",
+    "indexFile": "component/component_index.json"
+  },
+  "savedTo": "h-design-new/component"
+}
+```
+
+`savedTo` 是相对 `LIB_OUT_DIR` 的路径，文件已直接写到 `{LIB_OUT_DIR}/h-design-new/component/` 下。**为避免覆盖已有数据，若该目录已存在会直接返回 500 报错**，需先手动清理或换一个 `source` 名再重试。
+
+**响应 400 — 未上传文件 / source 格式错误：**
+```json
+{ "error": "send a .pix file via -F \"file=@library.pix\"" }
+{ "error": "source must be a simple directory name (letters/digits/-/_, no path separators)" }
+```
+
+**响应 500 — 拆解失败**（文件不是合法 `.pix`、解析失败、没有可拆出的组件集，或 `source` 目录已存在）：
 ```json
 { "error": "parse failed: library.pix" }
 { "error": "no component sets found" }
+{ "error": "目标目录已存在，为避免覆盖已有数据请先手动清理后重试: h-design-new/component" }
 ```
 
-> 实测验证：上传一个含 1 个组件集（2 个变体）的真实 `.pix` 文件，返回 `{"total":1,"componentSets":1,"standaloneComponents":0,...}`，解压 zip 得到 `component/component_index.json` + `component/2_105.txt`，内容与 CLI 拆解结果一致；上传非 `.pix` 文件返回 `{"error":"parse failed: <原始文件名>"}`（已对临时路径做了脱敏，不会泄露服务器目录结构）。
+> 实测验证：上传一个含 1 个组件集（2 个变体）的真实 `.pix` 文件，不传 `source` 时返回 `{"total":1,"componentSets":1,"standaloneComponents":0,...}` + zip，解压得到 `component/component_index.json` + `component/2_105.txt`，内容与 CLI 拆解结果一致；上传非 `.pix` 文件返回 `{"error":"parse failed: <原始文件名>"}`（已对临时路径做了脱敏，不会泄露服务器目录结构）。
 
-> ⚠️ 上传体积限制 200MB（`.pix` 库文件可能较大）；接口本身只做"拆解 + 打包返回"，**不会**自动写入 `lib-out/`、不会更新 `search_index.json`，避免未经检查就覆盖现有数据。
+> ⚠️ 上传体积限制 200MB（`.pix` 库文件可能较大）；无论哪种方式，本接口只完成"拆解落盘"，**不会**自动更新 `search_index.json`，仍需按上方全流程继续登记 SOURCES → 重新生成索引 → 重启验证，避免未经检查就让新数据生效。
 
 ---
 

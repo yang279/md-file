@@ -38,8 +38,10 @@ function buildZip(outDir) {
   return fs.readFileSync(zipPath);
 }
 
-// splitLibrary(pixBuffer, { originalName, publishFile })
-//   → { stats: { total, componentSets, standaloneComponents, compDir, indexFile }, zip: base64 }
+// splitLibrary(pixBuffer, { originalName, publishFile, saveDir, source })
+//   不传 saveDir → { stats: { total, componentSets, standaloneComponents, compDir, indexFile }, zip: base64 }
+//   传了 saveDir → 跳过打包，直接把 component/ 目录写入 saveDir，
+//                  返回 { stats: {...}, savedTo: '{source}/component' }
 //   → { error: '...' }
 async function splitLibrary(pixBuffer, opts = {}) {
   const mod = await getWasm();
@@ -64,6 +66,18 @@ async function splitLibrary(pixBuffer, opts = {}) {
     const rel = p => (p ? path.relative(outDir, p) || '.' : p);
     result.compDir   = rel(result.compDir);
     result.indexFile = rel(result.indexFile);
+
+    // 指定了 saveDir：直接把 component/ 整个目录写到 lib-out/{source}/，跳过 zip 打包，
+    // 调用方无需再手动解压挪动文件
+    if (opts.saveDir) {
+      const destComponent = path.join(opts.saveDir, 'component');
+      if (fs.existsSync(destComponent)) {
+        return { error: `目标目录已存在，为避免覆盖已有数据请先手动清理后重试: ${opts.source}/component` };
+      }
+      fs.mkdirSync(opts.saveDir, { recursive: true });
+      fs.cpSync(path.join(outDir, 'component'), destComponent, { recursive: true });
+      return { stats: result, savedTo: `${opts.source}/component` };
+    }
 
     const zipBuf = buildZip(outDir);
     return { stats: result, zip: zipBuf.toString('base64') };
