@@ -186,6 +186,26 @@ function localFilter(query, entries, topK = 10) {
     .map(x => x.entry);
 }
 
+// LLM 兜底：按变体名与 query 的 token 匹配度选出最佳变体
+function pickBestVariant(entry, query) {
+  const variants = entry.variants || [];
+  if (variants.length === 0) {
+    return { variantKey: null, reason: '算法兜底：standalone 无变体' };
+  }
+  const tokens = tokenize(query);
+  const scored = variants
+    .map(v => {
+      let score = 0;
+      for (const tok of tokens) {
+        if (v.name.includes(tok)) score += tok.length;
+      }
+      return { variant: v, score };
+    })
+    .sort((a, b) => b.score - a.score);
+  const best = scored[0].variant;
+  return { variantKey: best.variantKey || best.guid, reason: '算法兜底（LLM 未返回有效结果）' };
+}
+
 // ── 第三步 A：LLM 选组件集（轻量 prompt：仅名称 + 变体数量，不展开变体）────────
 //
 // 候选集的全部变体名 token 量很大（少数组件集变体数上百），一次性塞给模型会让
@@ -522,15 +542,26 @@ async function matchVariantsTogether(queries) {
 
   // Step 3: 一次性选组件集，每个簇一个代表（而非每条实例一个）
   console.log(`[match_variant] Step 3：${matchable.length} 个簇一次性交给 LLM 选组件集`);
-  const pickedEntries = await selectComponentSetsTogether(matchable, anchorNote);
+  let pickedEntries;
+  try {
+    pickedEntries = await selectComponentSetsTogether(matchable, anchorNote);
+  } catch (err) {
+    console.warn(`[match_variant] selectComponentSetsTogether 失败（${err.message}），全部算法兜底`);
+    pickedEntries = matchable.map(() => null);
+  }
 
-  // Step 4: 按组件集分组，每组一次性选变体，picks 广播给簇内所有原始索引
-  const groups = new Map();
+  // Step 4: 按组件集分组，LLM 未选出的位置算法兜底（候选首位）
+  const groups = new Map(); // entry -> Array<{ ci, isFallback }>
   matchable.forEach((ci, i) => {
-    const entry = pickedEntries[i];
-    if (!entry) return;
+    let entry = pickedEntries[i];
+    let isFallback = false;
+    if (!entry) {
+      entry = ci.candidates[0];
+      isFallback = true;
+      console.log(`[match_variant] matchVariantsTogether → 「${ci.query}」LLM 未选组件集，算法兜底「${entry.name}」`);
+    }
     if (!groups.has(entry)) groups.set(entry, []);
-    groups.get(entry).push(ci);
+    groups.get(entry).push({ ci, isFallback });
   });
   console.log(`[match_variant] Step 4：按组件集分成 ${groups.size} 组（${[...groups.entries()].map(([e, g]) => `${e.name}×${g.length}`).join('、') || '(无)'}）`);
 
@@ -538,12 +569,25 @@ async function matchVariantsTogether(queries) {
   const newMapEntries = [];
 
   for (const [entry, groupItems] of groups) {
-    const picks = await selectVariantsTogether(entry, groupItems, anchorNote);
-    groupItems.forEach((ci, j) => {
-      const pick = picks[j];
+    let picks;
+    try {
+      picks = await selectVariantsTogether(entry, groupItems.map(g => g.ci), anchorNote);
+    } catch (err) {
+      console.warn(`[match_variant] selectVariantsTogether「${entry.name}」失败（${err.message}），算法兜底`);
+      picks = groupItems.map(() => null);
+    }
+    groupItems.forEach(({ ci, isFallback }, j) => {
+      let pick = picks[j];
+      let usedFallback = isFallback;
+      if (!pick) {
+        pick = pickBestVariant(entry, ci.query);
+        usedFallback = true;
+        console.log(`[match_variant] matchVariantsTogether → 「${ci.query}」LLM 未选变体，算法兜底「${entry.name}」`);
+      }
       const result = toMatchResult(entry, pick);
+      if (result && usedFallback) result.fallback = true;
       ci.clusterIndices.forEach(i => resultByIndex.set(i, result));
-      if (pick && (pick.variantKey != null || (entry.variants || []).length === 0)) {
+      if (!usedFallback && pick && (pick.variantKey != null || (entry.variants || []).length === 0)) {
         newMapEntries.push({ key: ci.clusterKey, componentKey: entry.componentKey || entry.guid, variantKey: pick.variantKey || null });
       }
     });
@@ -590,25 +634,53 @@ async function matchVariant(description) {
     console.log(`[match_variant] matchVariant → 描述已含中文（${Math.round(chineseCount / nonSpace.length * 100)}%），跳过语义提取`);
     searchQuery = description;
   } else {
-    searchQuery = await normalizeQuery(description);
+    try {
+      searchQuery = await normalizeQuery(description);
+    } catch (err) {
+      console.warn(`[match_variant] matchVariant → normalizeQuery 失败（${err.message}），使用原始描述`);
+      searchQuery = description;
+    }
   }
 
   // Step 2: 本地过滤
   const candidates = localFilter(searchQuery, entries, 10);
   if (candidates.length === 0) return null;
 
-  // Step 3a: LLM 选组件集（轻量 prompt，不含变体明细）
-  const entry = await selectComponentSet(description, candidates);
-  if (!entry) return null;
+  // Step 3a: LLM 选组件集，失败时算法兜底（本地过滤分数最高的候选）
+  let entry = null;
+  let usedFallback = false;
+  try {
+    entry = await selectComponentSet(description, candidates);
+  } catch (err) {
+    console.warn(`[match_variant] matchVariant → selectComponentSet 失败（${err.message}），算法兜底`);
+  }
+  if (!entry) {
+    console.log(`[match_variant] matchVariant → LLM 未选出组件集，算法兜底「${candidates[0].name}」`);
+    entry = candidates[0];
+    usedFallback = true;
+  }
 
-  // Step 3b: LLM 在选定组件集内精选变体（仅传该集合自己的变体）
-  const picked = await selectVariant(description, entry);
-  if (!picked) return null;
+  // Step 3b: LLM 精选变体，失败时算法兜底（按变体名 token 匹配度）
+  let picked = null;
+  try {
+    picked = await selectVariant(description, entry);
+  } catch (err) {
+    console.warn(`[match_variant] matchVariant → selectVariant 失败（${err.message}），算法兜底`);
+  }
+  if (!picked) {
+    console.log(`[match_variant] matchVariant → LLM 未选出变体，算法兜底`);
+    picked = pickBestVariant(entry, description);
+    usedFallback = true;
+  }
 
   const result = toMatchResult(entry, picked);
+  if (!result) return null;
+  if (usedFallback) result.fallback = true;
 
-  // 沉淀到规范映射表
-  await updateCanonicalMap([{ key: cKey, componentKey: result.componentKey, variantKey: picked.variantKey || null }]);
+  // 只在 LLM 全程成功时沉淀到规范映射表（兜底结果下次继续尝试 LLM）
+  if (!usedFallback) {
+    await updateCanonicalMap([{ key: cKey, componentKey: result.componentKey, variantKey: picked.variantKey || null }]);
+  }
   return result;
 }
 
